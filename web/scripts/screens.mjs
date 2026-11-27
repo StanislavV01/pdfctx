@@ -16,11 +16,14 @@ page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 page.on("pageerror", (e) => errors.push(String(e)));
 
 await page.goto(UI, { waitUntil: "networkidle" });
+await page.screenshot({ path: `${OUT}/0-landing.png` });
+
+await page.goto(`${UI}/app`, { waitUntil: "networkidle" });
 await page.screenshot({ path: `${OUT}/1-documents.png`, fullPage: true });
 
 const { documents } = await (await fetch(`${API}/v1/documents`)).json();
 const doc = documents.find((d) => d.status === "ok");
-await page.goto(`${UI}/d/${encodeURIComponent(doc.id)}`, { waitUntil: "networkidle" });
+await page.goto(`${UI}/app/d/${encodeURIComponent(doc.id)}`, { waitUntil: "networkidle" });
 await page.screenshot({ path: `${OUT}/2-viewer.png` });
 
 await page.getByPlaceholder(/Ask the document/).fill(QUERY);
@@ -40,7 +43,17 @@ await page.waitForLoadState("networkidle");
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${OUT}/3-search.png` });
 
-await page.goto(`${UI}/audit`, { waitUntil: "networkidle" });
+await page.goto(`${UI}/app/metrics`, { waitUntil: "networkidle" });
+await page.getByPlaceholder(/e.g. 2021-2023/).fill("2016-2018");
+await page.getByRole("button", { name: "Build table" }).click();
+await page.locator("table").waitFor({ timeout: 30000 });
+await page.screenshot({ path: `${OUT}/5-metrics.png`, fullPage: true });
+await page.locator("table a").first().click();
+await page.waitForLoadState("networkidle");
+await page.waitForTimeout(800);
+await page.screenshot({ path: `${OUT}/6-metric-source.png` });
+
+await page.goto(`${UI}/app/audit`, { waitUntil: "networkidle" });
 await page.screenshot({ path: `${OUT}/4-audit.png`, fullPage: true });
 
 await browser.close();

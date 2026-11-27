@@ -1,12 +1,22 @@
-# pdfctx web demo
+# pdfctx web
 
-A Next.js UI over the pdfctx REST API: document list with upload, outline navigation, search and
-`context_pack` side by side, and the page image with every cited block highlighted at its exact bounding box.
+One Next.js app, two modes:
+
+- **local** (default): the open-source server on your machine. No accounts. `../scripts/demo.sh` starts both.
+- **cloud** (`NEXT_PUBLIC_PDFCTX_MODE=cloud`): pdfctx Cloud. Landing, pricing, email sign-in, the workspace
+  app, API keys. The browser calls `/api/*` on the same origin. Next forwards that to the cloud server
+  (`PDFCTX_BACKEND`), so the session cookie stays first-party and there is no CORS.
+
+Pages: `/` landing · `/pricing` · `/signin` · `/app` documents and upload · `/app/d/[id]` viewer (outline,
+search, `context_pack`, cited boxes on the page) · `/app/metrics` metrics table with source links and CSV ·
+`/app/keys` API keys and agent setup · `/app/audit` every tool call.
 
 ```bash
-# terminal 1 — the API (CORS allowed for the web origin)
-PDFCTX_WEB_ORIGIN=http://localhost:3000 pdfctx serve-http ~/Documents/reports --uploads ./uploads
+# local
+PDFCTX_WEB_ORIGIN=http://localhost:3000 pdfctx serve-http ~/Documents/reports --uploads ~/pdfctx-uploads
+cd web && npm install && npm run dev                                   # http://localhost:3000/app
 
-# terminal 2 — the UI
-cd web && npm install && NEXT_PUBLIC_PDFCTX_API=http://127.0.0.1:8000 npm run dev
+# cloud, on your machine (the sign-in link is printed in the server log when RESEND_API_KEY is unset)
+pdfctx serve-cloud --data ./cloud-data --public-url http://localhost:3000
+cd web && NEXT_PUBLIC_PDFCTX_MODE=cloud npm run dev                    # http://localhost:3000
 ```

@@ -58,6 +58,18 @@ export default function Viewer() {
   const [pack, setPack] = useState<ContextPack | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Opened from the metrics table: ?page=46&box=x0,top,x1,bottom highlights the cited row's table.
+  const [cited, setCited] = useState<{ page: number; box: BBox } | null>(null);
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const p = Number(q.get("page"));
+    const box = (q.get("box") ?? "").split(",").map(Number);
+    if (p > 0) setPage(p);
+    if (p > 0 && box.length === 4 && box.every((v) => Number.isFinite(v))) {
+      setCited({ page: p, box: box as BBox });
+    }
+  }, []);
 
   useEffect(() => {
     api
@@ -129,6 +141,7 @@ export default function Viewer() {
             onLoad={(e) => setSize({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
           />
           {size && boxes.map((r) => <Highlight key={r.block_id} bbox={r.bbox} size={size} strong={r.block_id === selected} />)}
+          {size && cited && cited.page === page && <Highlight bbox={cited.box} size={size} strong />}
         </div>
       </section>
 

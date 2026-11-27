@@ -42,6 +42,6 @@ trap 'kill $API_PID 2>/dev/null || true' EXIT INT TERM
 for _ in $(seq 1 60); do curl -sf http://127.0.0.1:8000/healthz >/dev/null && break; sleep 1; done
 
 echo
-echo "==> open http://localhost:3000  (try: purchases of property plant and equipment 2018)"
+echo "==> open http://localhost:3000/app  (search: purchases of property plant and equipment 2018; or the Metrics tab)"
 echo
 cd web && NEXT_PUBLIC_PDFCTX_API=http://127.0.0.1:8000 npm run dev
