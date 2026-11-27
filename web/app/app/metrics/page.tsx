@@ -45,7 +45,7 @@ export default function Metrics() {
   }, []);
 
   const label = (m: string) => METRICS.find(([id]) => id === m)?.[1] ?? m;
-  const args = () => [metrics, parseYears(years), [...picked]] as const;
+  const args = (): [string[], number[] | null, string[]] => [metrics, parseYears(years), [...picked]];
 
   async function run() {
     setBusy(true);
