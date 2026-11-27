@@ -1,0 +1,34 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      systems:
+        description: systems to run
+        default: baseline,pdfctx-structure,pdfctx-context,pdfctx-tables,pdfctx-hybrid,pdfctx-rerank,pdf-mcp
+      scope:
+        description: doc or corpus
+        default: doc
+
+jobs:
+  financebench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pdfctx-bench
+          key: financebench-cc39aeb-${{ hashFiles('src/**/*.py') }}
+          restore-keys: financebench-cc39aeb-
+      - run: pip install -e ".[embed,dev]" pdf-mcp
+      - run: python -m bench.financebench --systems "${{ inputs.systems }}" --scope "${{ inputs.scope }}" | tee bench-table.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench-results
+          path: |
+            bench/results/
+            bench-table.md
