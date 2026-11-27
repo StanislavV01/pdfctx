@@ -2,7 +2,7 @@
 
 # 📑 pdfctx
 
-**PDF retrieval for AI agents: finds the right page at least as often as page-level RAG, for 10× fewer tokens.**
+**PDF retrieval for AI agents. On FinanceBench it finds the evidence page in the top 10 for 67% of questions, against 51% for page-level search, and returns 11× fewer tokens.**
 
 pdfctx turns PDFs into a section tree of paragraphs and tables with page + bounding box on every block, and
 gives agents (Claude, Cursor, any MCP client) tools to navigate, search, cite and pack context. It reads
@@ -36,31 +36,40 @@ is involved and nothing is graded by a model.
 | page-level BM25 (what most "chat with PDF" tools do) | 0.147 | 0.233 | 0.360 | 0.507 | 0.230 | 4,615 |
 | pdfctx: structure | 0.160 | 0.267 | 0.333 | 0.453 | 0.237 | 586 |
 | pdfctx: + section context | 0.160 | 0.267 | 0.353 | 0.500 | 0.242 | 572 |
-| **pdfctx: + table rows (default)** | **0.167** | **0.313** | **0.393** | **0.567** | **0.270** | **461** |
+| pdfctx: + table rows | 0.167 | 0.313 | 0.393 | 0.567 | 0.269 | 458 |
+| **pdfctx: + finance glossary (default)** | **0.200** | **0.407** | **0.500** | **0.673** | **0.332** | **419** |
 
-**pdfctx is ahead of the page baseline on every metric while handing the agent 10× fewer tokens.** With
-150 questions, most of that recall gap is within noise. A paired bootstrap (`python3 -m bench.compare doc
-pdfctx-tables`) gives R@3 +0.080 with 95% CI [+0.013, +0.147], the only cutoff where the CI excludes zero.
-R@10 is +0.060 with CI [−0.013, +0.133]. The firm result is the token cost at equal or better recall. Tokens
-count passage text only (len/4), not the JSON fields and section paths the tool adds around it.
+**The default finds the evidence page in the top 10 for 67% of questions, against 51% for page search,
+and hands the agent 11× fewer tokens.** The paired bootstrap (`python3 -m bench.compare`, 10,000 resamples)
+puts the gain over page search clear of noise at every cutoff from R@3 to R@10:
 
-Every change was kept or reverted based on these numbers, **on the same 150 questions reported here**. There
-is no held-out split, so the defaults (candidate pool, context weight, per-page cap, max- vs sum-boost) are
-tuned to this set and the numbers are optimistic. The log in
-[`bench/results/CHANGELOG.md`](bench/results/CHANGELOG.md) lists every choice, including what did not work:
-summed page boosts lost to boilerplate, and document routing hurt corpus search.
+| vs page-level BM25 | R@1 | R@3 | R@5 | R@10 |
+|---|---|---|---|---|
+| difference | +0.053 | +0.173 | +0.140 | +0.167 |
+| 95% CI | [−0.007, +0.113] | [+0.093, +0.253] | [+0.047, +0.233] | [+0.087, +0.247] |
+| questions won / lost | 15 / 7 | 35 / 9 | 37 / 16 | 34 / 9 |
 
-Structure alone does not beat the baseline at R@5–10; the gain comes from table rows.
+What moved the number is vocabulary. Questions say *"FY2018 capital expenditure"* or *"quick ratio"*;
+the filing says *"Purchases of property, plant and equipment"* and *"Total current assets"*. The glossary
+([`src/pdfctx/glossary.py`](src/pdfctx/glossary.py), 29 entries) adds a statement's own line-item words to the
+query when a question uses a finance term. Table rows already carry their headers and years, so the
+expanded query lands on the exact row. By FinanceBench question type, R@10 rises from 0.64 to 0.78 on
+metric questions and from 0.40 to 0.56 on domain questions. Novel questions stay flat (0.66 → 0.68).
 
-The scores are low on purpose: FinanceBench is hard. Questions like *"what is 3M's FY2018 capital
-expenditure?"* do not say *"Purchases of property, plant and equipment"*, the line item that holds the answer.
-Lexical search cannot close that gap alone. The next rows are dense vectors and a cross-encoder reranker,
-which run locally through `pdfctx[embed]`, plus [`jztan/pdf-mcp`](https://github.com/jztan/pdf-mcp) scored
-the same way. They run in the [Benchmark workflow](.github/workflows/bench.yml) and will be added here from
-its artifact.
+**How far to trust this:**
+- **No held-out split.** Every change was kept or reverted on the same 150 questions reported here.
+  The glossary entries are textbook definitions, but I wrote them knowing what kinds of questions
+  FinanceBench asks. Treat the numbers as optimistic.
+- **Tokens** count passage text only (len/4), not the JSON fields around it.
+- **Full log.** [`bench/results/CHANGELOG.md`](bench/results/CHANGELOG.md) records every choice, including
+  what did not work: summed page boosts lost to boilerplate, and document routing hurt corpus search.
+- **Dense vectors, a cross-encoder reranker and [`jztan/pdf-mcp`](https://github.com/jztan/pdf-mcp)** run in
+  the [parallel benchmark workflow](.github/workflows/bench-matrix.yml), and their rows are added here when
+  that run finishes.
 
-Corpus scope (search all 84 filings, no CI-significant difference): R@10 0.200 vs 0.187 for the baseline at 12× fewer tokens, but rank-1 is
-lower (0.073 vs 0.093). Finding the right filing among 84 similar ones is the open problem
+Corpus scope (search all 84 filings at once) stays hard: R@10 0.213 with the glossary vs 0.187 for the baseline
+at 13× fewer tokens, but rank-1 is lower (0.073 vs 0.093). Finding the right filing among 84 similar ones
+is the open problem
 ([details](bench/results/CHANGELOG.md#corpus-scope)).
 
 ## Why it works

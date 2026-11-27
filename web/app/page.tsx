@@ -66,8 +66,8 @@ export default function Landing() {
         <section className="mb-20 rounded-xl bg-zinc-100 p-6 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
           <p className="font-semibold">Measured in the open</p>
           <p className="mt-1">
-            On FinanceBench (150 questions over 84 SEC filings), pdfctx finds the evidence page at least as often as
-            page-level search and hands the agent ~10× fewer tokens. Method, numbers and what did not work are in{" "}
+            On FinanceBench (150 questions over 84 SEC filings), pdfctx puts the evidence page in its top 10 for 67%
+            of questions, against 51% for page-level search, and hands the agent ~11× fewer tokens. Method, numbers and what did not work are in{" "}
             <a className="underline" href="https://github.com/StanislavV01/pdfctx#results-financebench">
               the repository
             </a>

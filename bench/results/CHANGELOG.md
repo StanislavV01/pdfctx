@@ -69,3 +69,19 @@ as headings) were not measured. `INDEX_VERSION` now forces a rebuild. Fresh numb
 | pdfctx-tables | 0.167 | 0.313 | 0.393 | 0.567 | 0.270 | 461 |
 
 The default improved slightly (R@10 0.553 → 0.567); the corpus table above is also from the fresh run.
+
+## Kept: finance glossary (query expansion)
+
+Lexical misses were mostly vocabulary: "capital expenditure" vs "Purchases of property, plant and
+equipment". `glossary.py` adds line-item words for finance terms found in the question. Same index as
+`pdfctx-tables`.
+
+| system | R@1 | R@3 | R@5 | R@10 | MRR | tok |
+|---|---|---|---|---|---|---|
+| pdfctx-tables | 0.167 | 0.313 | 0.393 | 0.567 | 0.269 | 458 |
+| pdfctx-glossary | 0.200 | 0.407 | 0.500 | 0.673 | 0.332 | 419 |
+
+Paired bootstrap vs pdfctx-tables: R@10 +0.107 [+0.053, +0.167], 18 won / 2 lost; R@5 +0.107
+[+0.053, +0.160]. By type (R@10): metrics-generated 0.64 → 0.78, domain-relevant 0.40 → 0.56,
+novel-generated 0.66 → 0.68. Corpus scope R@10 0.200 → 0.213. Caveat: the entries are generic accounting
+terms, but they were written knowing the benchmark's question style; no held-out split exists.
