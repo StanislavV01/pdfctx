@@ -50,3 +50,25 @@ def test_ocr_can_be_turned_off(tmp_path, monkeypatch):
 
 def test_image_without_text_stays_no_text(pdf_dir):
     assert parse_pdf(pdf_dir / "image_only.pdf").status == "no_text"
+
+
+@needs_tesseract
+def test_ocr_page_budget(tmp_path, monkeypatch):
+    monkeypatch.setenv("PDFCTX_OCR", "1")
+    monkeypatch.setenv("PDFCTX_OCR_MAX_PAGES", "0")
+    assert parse_pdf(pdfgen.make_scanned(tmp_path / "scan.pdf")).status == "no_text"
+
+
+@needs_tesseract
+def test_huge_page_is_rendered_within_the_pixel_cap(tmp_path, monkeypatch):
+    from reportlab.pdfgen import canvas
+
+    from pdfctx.parse import ocr
+    from pdfctx.parse.pdf import _render_for_ocr
+
+    big = tmp_path / "big.pdf"
+    c = canvas.Canvas(str(big), pagesize=(3000, 3000))  # 41.7 inches square
+    c.rect(10, 10, 100, 100)
+    c.save()
+    image, scale = _render_for_ocr(big, 1)
+    assert image.width * image.height <= ocr.MAX_PIXELS * 1.01 and scale < 300 / 72

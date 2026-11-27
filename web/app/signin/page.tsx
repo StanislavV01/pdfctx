@@ -28,7 +28,7 @@ function SignInForm() {
     <div className="rounded-xl border border-zinc-200 p-6 text-center dark:border-zinc-800">
       <p className="font-semibold">Check your email</p>
       <p className="mt-1 text-sm text-zinc-500">
-        We sent a sign-in link to {email}. It works once and expires in 15 minutes.
+        We sent a sign-in link to {email}. Open it in this browser; it works once and expires in 15 minutes.
       </p>
     </div>
   ) : (

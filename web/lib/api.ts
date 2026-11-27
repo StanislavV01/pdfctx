@@ -170,6 +170,7 @@ export const api = {
   // cloud only
   me: () => call<Me>("/me"),
   requestLink: (email: string) => call<{ sent: boolean }>("/auth/request", json({ email })),
+  verify: (token: string) => call<{ ok: boolean }>("/auth/verify", json({ token })),
   logout: () => call<{ ok: boolean }>("/auth/logout", { method: "POST" }),
   keys: () => call<{ keys: ApiKey[] }>("/keys"),
   createKey: (name: string) => call<ApiKey>("/keys", json({ name })),

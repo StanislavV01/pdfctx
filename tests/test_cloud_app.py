@@ -42,10 +42,9 @@ def sign_in(server, email: str) -> TestClient:
     c = TestClient(server.app, base_url=BASE)
     assert c.post("/auth/request", json={"email": email}).json() == {"sent": True}
     link = server.links[email]
-    assert link.startswith("http://localhost:3000/api/auth/verify?token=")
-    r = c.get("/auth/verify", params={"token": link.split("token=")[1]}, follow_redirects=False)
-    assert r.status_code == 303 and r.headers["location"] == "http://localhost:3000/app"
-    assert "httponly" in r.headers["set-cookie"].lower()
+    assert link.startswith("http://localhost:3000/signin/confirm?token=")
+    r = c.post("/auth/verify", json={"token": link.split("token=")[1]}, headers=W)
+    assert r.status_code == 200 and "httponly" in r.headers["set-cookie"].lower()
     return c
 
 
@@ -55,8 +54,26 @@ def test_sign_in_and_me(server):
     assert me["email"] == "ana@fund.com" and me["workspace"]["plan"] == "free"
     assert me["workspace"]["pages_limit"] == 50
     assert TestClient(server.app, base_url=BASE).get("/me").status_code == 401
-    r = c.get("/auth/verify", params={"token": "used-or-wrong"}, follow_redirects=False)
-    assert r.headers["location"].endswith("/signin?error=expired")
+    assert c.post("/auth/verify", json={"token": "used-or-wrong"}, headers=W).status_code == 400
+    assert c.post("/auth/logout").status_code == 403  # a cross-site form cannot sign you out
+    assert c.post("/auth/logout", headers=W).json() == {"ok": True}
+    assert c.get("/me").status_code == 401
+
+
+def test_a_link_only_works_in_the_browser_that_asked_for_it(server):
+    asker = TestClient(server.app, base_url=BASE)
+    asker.post("/auth/request", json={"email": "victim@fund.com"})
+    token = server.links["victim@fund.com"].split("token=")[1]
+    other = TestClient(server.app, base_url=BASE)  # e.g. an attacker forwarding their own link
+    r = other.post("/auth/verify", json={"token": token}, headers=W)
+    assert r.status_code == 400 and "browser where you requested it" in r.json()["error"]
+    assert asker.post("/auth/verify", json={"token": token}, headers=W).status_code == 200
+
+
+def test_sign_in_requests_are_rate_limited_per_ip(server):
+    c = TestClient(server.app, base_url=BASE)
+    codes = [c.post("/auth/request", json={"email": f"u{i}@x.co"}).status_code for i in range(21)]
+    assert codes[:20] == [200] * 20 and codes[20] == 429
 
 
 def test_workspaces_are_isolated(server, report_pdf):
@@ -158,3 +175,32 @@ def test_stripe_webhook_upgrades_the_plan(server):
 
 def test_plans_are_public(server):
     assert [p["id"] for p in server.get("/plans").json()["plans"]] == ["free", "pro", "team"]
+
+
+def test_https_server_without_mail_refuses_to_start(tmp_path, monkeypatch):
+    monkeypatch.delenv("RESEND_API_KEY", raising=False)
+    monkeypatch.delenv("PDFCTX_LOG_SIGNIN_LINKS", raising=False)
+    from pdfctx.errors import PdfctxError
+
+    with pytest.raises(PdfctxError, match="RESEND_API_KEY"):
+        create_cloud_app(tmp_path / "d", "https://pdfctx.example.com")
+
+
+def test_parallel_uploads_cannot_exceed_the_plan(server, report_pdf):
+    from concurrent.futures import ThreadPoolExecutor
+
+    c = sign_in(server, "a@fund.com")
+    data = report_pdf.read_bytes()
+    acc = server.app.state.accounts
+    ws = acc.workspace(c.get("/me").json()["workspace"]["id"])
+    acc.add_usage(ws, 42)  # 8 pages left: room for two 4-page uploads
+
+    def upload(i: int) -> int:
+        return c.post(
+            "/v1/documents", content=data + b"%" * i, headers={**PDF, "x-filename": f"r{i}.pdf"}
+        ).status_code
+
+    with ThreadPoolExecutor(6) as ex:
+        codes = sorted(ex.map(upload, range(6)))
+    assert codes.count(201) == 2 and codes.count(402) == 4
+    assert acc.pages_used(ws) == 50

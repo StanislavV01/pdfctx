@@ -87,3 +87,29 @@ def test_unknown_price_and_events(acc):
     handle_event(acc, sub_event("evt_1", "customer.subscription.created", ws.id, price="price_other"))
     assert acc.workspace(ws.id).plan == "free"  # a price we do not sell grants nothing
     assert handle_event(acc, {"id": "evt_x", "type": "invoice.paid", "data": {"object": {}}}) == "ignored"
+
+
+def test_a_stale_event_does_not_downgrade_the_current_subscription(acc):
+    ws = acc.workspace_for_user(acc.verify_magic(acc.request_magic("a@b.co")))
+    new = sub_event("evt_1", "customer.subscription.created", ws.id)
+    new["data"]["object"]["id"] = "sub_2"
+    handle_event(acc, new)
+    assert acc.workspace(ws.id).stripe_subscription == "sub_2"
+    old = sub_event("evt_2", "customer.subscription.deleted", ws.id)  # about sub_1, cancelled long ago
+    assert handle_event(acc, old) == "ignored stale subscription"
+    assert acc.workspace(ws.id).plan == "pro"
+
+
+def test_a_failed_event_is_retried(acc, monkeypatch):
+    ws = acc.workspace_for_user(acc.verify_magic(acc.request_magic("a@b.co")))
+    event = sub_event("evt_1", "customer.subscription.created", ws.id)
+
+    def broken(*a, **k):
+        raise RuntimeError("database is locked")
+
+    monkeypatch.setattr(acc, "set_plan", broken)
+    with pytest.raises(RuntimeError):
+        handle_event(acc, event)
+    monkeypatch.undo()
+    monkeypatch.setenv("STRIPE_PRICE_PRO", "price_pro")
+    assert handle_event(acc, event) == "plan pro"  # Stripe's retry is applied, not dropped as a duplicate

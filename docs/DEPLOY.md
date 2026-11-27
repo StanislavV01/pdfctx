@@ -17,7 +17,7 @@ One container (see `Dockerfile`):
 | `PDFCTX_PUBLIC_URL` | yes | `https://your-host`: sign-in links and Stripe redirects |
 | `PDFCTX_ALLOWED_HOSTS` | yes | host names the API answers to. Behind the proxy that is `127.0.0.1`, plus the public host if the API is exposed |
 | `PDFCTX_WEB_ORIGIN` | yes | `https://your-host`, so browser requests with that Origin pass the guard |
-| `RESEND_API_KEY`, `PDFCTX_MAIL_FROM` | for real email | without them, sign-in links are only written to the log |
+| `RESEND_API_KEY`, `PDFCTX_MAIL_FROM` | yes on https | the server refuses to start on an https URL without it (`PDFCTX_LOG_SIGNIN_LINKS=1` overrides it for a private test server: links go to the log) |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | for billing | without them, checkout answers "billing is not configured" |
 | `STRIPE_PRICE_PRO`, `STRIPE_PRICE_TEAM` | for billing | recurring monthly price ids ($29 / $99) |
 | `PDFCTX_EMBED` | no | `fastembed` turns on dense vectors (more RAM and CPU; see the benchmark first) |

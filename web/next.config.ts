@@ -6,6 +6,8 @@ const backend = process.env.PDFCTX_BACKEND ?? "http://127.0.0.1:8000";
 
 const config: NextConfig = {
   reactStrictMode: true,
+  // Uploads of long scans (OCR) and MCP streams outlive the default 30 s proxy timeout.
+  experimental: { proxyTimeout: 15 * 60 * 1000 },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${backend}/:path*` }];
   },

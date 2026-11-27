@@ -13,11 +13,12 @@ curl -sf $URL/ | grep -q "Every number with its source row"
 echo "ok: landing page"
 
 J=(-H "content-type: application/json" -H "x-pdfctx: 1")
-curl -sf "${J[@]}" -d '{"email":"smoke@example.com"}' $URL/api/auth/request >/dev/null
+curl -sf -c /tmp/jar "${J[@]}" -d '{"email":"smoke@example.com"}' $URL/api/auth/request >/dev/null
 sleep 1
-LINK=$(docker logs pdfctx-smoke 2>&1 | grep -o "$URL/api/auth/verify?token=[A-Za-z0-9_-]*" | tail -1)
+LINK=$(docker logs pdfctx-smoke 2>&1 | grep -o "$URL/signin/confirm?token=[A-Za-z0-9_-]*" | tail -1)
 [ -n "$LINK" ] || { echo "no sign-in link in the log"; exit 1; }
-curl -s -c /tmp/jar -o /dev/null -w "%{http_code} %{redirect_url}\n" "$LINK" | grep -q "303 $URL/app"
+curl -sf "$LINK" | grep -q "Continue" || curl -sf "$LINK" >/dev/null  # the confirm page renders
+curl -sf -b /tmp/jar -c /tmp/jar "${J[@]}" -d "{\"token\":\"${LINK##*token=}\"}" $URL/api/auth/verify | grep -q '"ok":true'
 curl -sf -b /tmp/jar $URL/api/me | grep -q '"email":"smoke@example.com"'
 echo "ok: email sign-in"
 

@@ -20,7 +20,18 @@ from .model import Word
 
 DPI = 300
 MIN_CONFIDENCE = 50
-TIMEOUT_S = 60
+TIMEOUT_S = 60  # one page
+MAX_PIXELS = 12_000_000  # a letter page at 300 dpi is 8.4 M; bigger pages are rendered at lower dpi
+
+
+def max_pages() -> int:
+    """At most this many pages of one document are OCR'd (PDFCTX_OCR_MAX_PAGES, default 300)."""
+    return int(os.environ.get("PDFCTX_OCR_MAX_PAGES", "300"))
+
+
+def budget_s() -> float:
+    """Wall-clock budget for OCR of one document (PDFCTX_OCR_BUDGET_S, default 600 s)."""
+    return float(os.environ.get("PDFCTX_OCR_BUDGET_S", "600"))
 
 
 def available() -> bool:

@@ -143,6 +143,15 @@ def install_guard(app: FastAPI) -> None:
         return {"ok": True, "version": __version__}
 
 
+def _count_pages(data: bytes) -> int:
+    with PDFIUM_LOCK:
+        pdf = pdfium.PdfDocument(data)
+        try:
+            return len(pdf)
+        finally:
+            pdf.close()
+
+
 async def read_upload(request: Request) -> tuple[str, bytes, int]:
     """(file name, bytes, page count) of a raw PDF request body, within the size and page limits."""
     if request.headers.get("content-type", "").split(";")[0].strip().lower() != "application/pdf":
@@ -163,10 +172,7 @@ async def read_upload(request: Request) -> tuple[str, bytes, int]:
         raise HttpError(400, "not a PDF file")
     data = bytes(body)
     try:
-        with PDFIUM_LOCK:
-            pdf = pdfium.PdfDocument(data)
-            pages = len(pdf)
-            pdf.close()
+        pages = await run_in_threadpool(_count_pages, data)  # the lock may be held by an index run
     except pdfium.PdfiumError as e:
         raise HttpError(400, "the PDF cannot be opened") from e
     if pages > MAX_UPLOAD_PAGES:

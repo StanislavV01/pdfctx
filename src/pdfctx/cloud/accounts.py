@@ -7,6 +7,7 @@ database does not let anyone sign in.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import re
 import secrets
 import sqlite3
@@ -48,7 +49,7 @@ CREATE TABLE IF NOT EXISTS workspaces (
 CREATE INDEX IF NOT EXISTS ws_owner ON workspaces(owner_id);
 CREATE INDEX IF NOT EXISTS ws_customer ON workspaces(stripe_customer);
 CREATE TABLE IF NOT EXISTS magic (hash TEXT PRIMARY KEY, email TEXT NOT NULL, expires_at TEXT NOT NULL,
-  used INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL);
+  used INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, nonce TEXT);
 CREATE TABLE IF NOT EXISTS sessions (hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS api_keys (id TEXT PRIMARY KEY, workspace_id TEXT NOT NULL,
   hash TEXT UNIQUE NOT NULL,
@@ -118,8 +119,11 @@ class Accounts:
 
     # -- sign-in ---------------------------------------------------------------------------------
 
-    def request_magic(self, email: str) -> str:
-        """A single-use sign-in token for `email` (the raw token goes into the emailed link)."""
+    def request_magic(self, email: str, nonce: str | None = None) -> str:
+        """A single-use sign-in token for `email` (the raw token goes into the emailed link).
+
+        With `nonce`, the link works only in the browser holding the matching cookie, so a link that
+        someone else requested cannot sign you into their workspace."""
         email = email.strip().lower()
         if not _EMAIL.match(email):
             raise PdfctxError("enter a valid email address")
@@ -132,17 +136,25 @@ class Accounts:
                 raise PdfctxError("too many sign-in emails; try again in an hour")
             token = secrets.token_urlsafe(32)
             self.db.execute(
-                "INSERT INTO magic VALUES (?,?,?,0,?)",
-                (_hash(token), email, _iso(self.now() + MAGIC_TTL), _iso(self.now())),
+                "INSERT INTO magic VALUES (?,?,?,0,?,?)",
+                (
+                    _hash(token),
+                    email,
+                    _iso(self.now() + MAGIC_TTL),
+                    _iso(self.now()),
+                    _hash(nonce) if nonce else None,
+                ),
             )
         return token
 
-    def verify_magic(self, token: str) -> User:
+    def verify_magic(self, token: str, nonce: str | None = None) -> User:
         """Use a sign-in token once; creates the user and their workspace on first sign-in."""
         with self._lock:
             row = self.db.execute("SELECT * FROM magic WHERE hash=?", (_hash(token),)).fetchone()
             if row is None or row["used"] or row["expires_at"] < _iso(self.now()):
                 raise PdfctxError("this sign-in link is invalid or has expired; request a new one")
+            if row["nonce"] and (not nonce or not hmac.compare_digest(row["nonce"], _hash(nonce))):
+                raise PdfctxError("open the sign-in link in the browser where you requested it")
             self.db.execute("UPDATE magic SET used=1 WHERE hash=?", (row["hash"],))
             return self._user_for_email(row["email"])
 
@@ -297,6 +309,12 @@ class Accounts:
                 "Upgrade the plan to add more."
             )
 
+    def reserve(self, ws: Workspace, pages: int) -> None:
+        """Check the plan and count the pages in one step, so parallel uploads cannot all pass the check."""
+        with self._lock:
+            self.check_quota(ws, pages)
+            self.add_usage(ws, pages)
+
     def add_usage(self, ws: Workspace, pages: int) -> None:
         with self._lock:
             self.db.execute(
@@ -306,6 +324,9 @@ class Accounts:
             )
 
     # -- billing events --------------------------------------------------------------------------
+
+    def seen_event(self, event_id: str) -> bool:
+        return self.db.execute("SELECT 1 FROM stripe_events WHERE id=?", (event_id,)).fetchone() is not None
 
     def first_time_event(self, event_id: str) -> bool:
         """True once per Stripe event id (Stripe retries deliveries)."""

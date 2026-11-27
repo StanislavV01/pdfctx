@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -45,7 +46,7 @@ class _Raw:
     words: dict[int, list[Word]]
     widths: dict[int, float]
     heights: dict[int, float]
-    images: dict[int, Image.Image]  # rendered pages that have no text layer, for OCR
+    ocr_wanted: list[int]  # pages without a text layer
     bookmarks: list[tuple[int, str, int]]
     meta_title: str
 
@@ -60,7 +61,7 @@ def _extract(path: Path) -> _Raw | ParsedDoc:
         return ParsedDoc(path, path.stem, 0, status="failed", error=_error(e))
     try:
         n = len(pdf)
-        raw = _Raw(n, {}, {}, {}, {}, [], "")
+        raw = _Raw(n, {}, {}, {}, [], [], "")
         do_ocr = ocr.available()
         for i in range(n):
             page = pdf[i]
@@ -68,7 +69,7 @@ def _extract(path: Path) -> _Raw | ParsedDoc:
             raw.widths[no], raw.heights[no] = page.get_width(), page.get_height()
             raw.words[no] = page_words(page)
             if do_ocr and sum(len(w.text) for w in raw.words[no]) < 5:
-                raw.images[no] = page.render(scale=ocr.DPI / 72).to_pil()
+                raw.ocr_wanted.append(no)  # rendered one at a time later, never all at once
             page.close()
         for item in pdf.get_toc():
             dest = item.get_dest()
@@ -84,10 +85,31 @@ def _extract(path: Path) -> _Raw | ParsedDoc:
         pdf.close()
 
 
+def _render_for_ocr(path: Path, no: int) -> tuple[Image.Image, float] | None:
+    """One page at OCR resolution, scaled to stay under ocr.MAX_PIXELS; the lock is held only here."""
+    with PDFIUM_LOCK:
+        pdf = pdfium.PdfDocument(str(path))
+        try:
+            page = pdf[no - 1]
+            w, h = page.get_size()
+            scale = min(ocr.DPI / 72, (ocr.MAX_PIXELS / max(w * h, 1.0)) ** 0.5)
+            if scale < 1.0:  # under 72 dpi OCR is useless: a huge page, skip it
+                return None
+            return page.render(scale=scale).to_pil(), scale
+        finally:
+            pdf.close()
+
+
 def _assemble(raw: _Raw, path: Path) -> ParsedDoc:
     ocr_pages = []
-    for no, image in sorted(raw.images.items()):
-        words = ocr.ocr_image(image, ocr.DPI / 72)
+    deadline = time.monotonic() + ocr.budget_s()
+    for no in raw.ocr_wanted[: ocr.max_pages()]:
+        if time.monotonic() > deadline:
+            break
+        rendered = _render_for_ocr(path, no)
+        if rendered is None:
+            continue
+        words = ocr.ocr_image(*rendered)
         if words:
             raw.words[no] = words
             ocr_pages.append(no)

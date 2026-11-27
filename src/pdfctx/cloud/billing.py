@@ -100,9 +100,15 @@ def verify(payload: bytes, header: str, secret: str, now: float | None = None) -
 
 
 def handle_event(acc: Accounts, event: dict) -> str:
-    """Apply a verified event. Returns what was done (for logs and tests)."""
-    if not acc.first_time_event(event.get("id", "")):
+    """Apply a verified event once. It is recorded only after it was applied, so a failure is retried."""
+    if acc.seen_event(event.get("id", "")):
         return "duplicate"
+    result = _apply(acc, event)
+    acc.first_time_event(event.get("id", ""))
+    return result
+
+
+def _apply(acc: Accounts, event: dict) -> str:
     kind = event.get("type", "")
     obj = event.get("data", {}).get("object", {})
     if kind == "checkout.session.completed":
@@ -127,6 +133,9 @@ def handle_event(acc: Accounts, event: dict) -> str:
             "trialing",
             "past_due",
         )
+        if ws.stripe_subscription and obj.get("id") != ws.stripe_subscription and not active:
+            # A late event about an older or abandoned subscription must not downgrade the current one.
+            return "ignored stale subscription"
         items = obj.get("items", {}).get("data", [])
         plan = plan_for_price(items[0]["price"]["id"]) if items else None
         acc.set_plan(
