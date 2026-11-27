@@ -15,6 +15,9 @@ from .parse import parse_pdf
 from .store import BlockRow, DocumentRow, SectionRow, Store
 from .units import make_units
 
+# Bump whenever parsing, outline or unit building changes, so existing indexes are rebuilt.
+INDEX_VERSION = 2
+
 
 def tokens(text: str) -> int:
     return math.ceil(len(text) / 4)
@@ -31,7 +34,7 @@ class IndexOptions:
             "contextual": self.contextual,
             "table_rows": self.table_rows,
             "embedder": self.embedder.name if self.embedder else None,
-            "v": 1,
+            "v": INDEX_VERSION,
         }
         return hashlib.sha256(json.dumps(key, sort_keys=True).encode()).hexdigest()[:16]
 

@@ -156,3 +156,11 @@ def test_boilerplate_page_does_not_beat_a_strong_match(store, report_pdf):
     # page 1 has several weak "period" matches; the real answer is one strong match on page 4
     index_paths(store, [report_pdf])
     assert pdfgen.TERMINATION_SENTENCE in _top_text(store, search(store, "termination notice period"))
+
+
+def test_parser_upgrade_reindexes(store, report_pdf, monkeypatch):
+    import pdfctx.indexer as indexer
+
+    index_paths(store, [report_pdf])
+    monkeypatch.setattr(indexer, "INDEX_VERSION", indexer.INDEX_VERSION + 1)
+    assert len(index_paths(store, [report_pdf]).updated) == 1
