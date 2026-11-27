@@ -119,15 +119,33 @@ class Store:
     def __init__(self, path: Path | str):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._lock = threading.RLock()
-        self.db = sqlite3.connect(self.path, check_same_thread=False, isolation_level=None)
-        self.db.row_factory = sqlite3.Row
+        self._lock = threading.RLock()  # one writer at a time
+        # One connection per thread. A single connection shared by the server's worker threads lets one
+        # request read another's half-finished results (and sqlite3 raises "API misuse"); WAL lets the
+        # per-thread connections read committed data while a write is in progress.
+        self._local = threading.local()
+        self._conns: list[sqlite3.Connection] = []
         self.db.execute("PRAGMA journal_mode=WAL")
-        self.db.execute("PRAGMA synchronous=NORMAL")
         self.db.executescript(SCHEMA)
 
+    @property
+    def db(self) -> sqlite3.Connection:
+        conn = getattr(self._local, "conn", None)
+        if conn is None:
+            conn = sqlite3.connect(self.path, check_same_thread=False, isolation_level=None, timeout=30)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA synchronous=NORMAL")
+            self._local.conn = conn
+            with self._lock:
+                self._conns.append(conn)
+        return conn
+
     def close(self) -> None:
-        self.db.close()
+        with self._lock:
+            for conn in self._conns:
+                conn.close()
+            self._conns.clear()
+        self._local = threading.local()
 
     # -- writes -------------------------------------------------------------------------------
 
