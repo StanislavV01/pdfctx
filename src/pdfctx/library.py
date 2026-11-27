@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import dataclasses
 import io
 import threading
 import time
@@ -140,7 +141,7 @@ class Library:
         )
         return out
 
-    def _search(self, query: str, doc_ids: list[str] | None, k: int, per_page_cap: int | None = -1):
+    def _search(self, query: str, doc_ids: list[str] | None, k: int, per_page_cap: int | None = None):
         if not isinstance(query, str) or not query.strip():
             raise PdfctxError("query must be a non-empty string")
         if doc_ids is not None:
@@ -151,7 +152,9 @@ class Library:
             query,
             doc_ids=doc_ids,
             k=k,
-            config=self.config,
+            config=self.config
+            if per_page_cap is None
+            else dataclasses.replace(self.config, per_page_cap=per_page_cap),
             embedder=self.embedder,
             reranker=self.reranker,
         )

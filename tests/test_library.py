@@ -120,3 +120,19 @@ def test_refresh_picks_up_new_files(tmp_path):
     pdfgen.make_text_report(folder / "new.pdf", "The deposit is refundable.")
     assert lib.search("deposit refundable")["results"]
     lib.close()
+
+
+def test_context_pack_search_allows_several_blocks_per_page(lib):
+    lib.refresh()
+    one = lib._search("revenue region", None, k=20)
+    many = lib._search("revenue region", None, k=20, per_page_cap=3)
+
+    def most_per_page(hits):
+        counts: dict = {}
+        for h in hits:
+            page = lib.store.get_block(h.block_id).page
+            counts[page] = counts.get(page, 0) + 1
+        return max(counts.values())
+
+    assert most_per_page(one) == 1
+    assert most_per_page(many) > 1
