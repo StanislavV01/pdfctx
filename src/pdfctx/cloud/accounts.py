@@ -318,3 +318,5 @@ class Accounts:
 
 class QuotaExceeded(PdfctxError):
     """The workspace's plan does not allow more pages."""
+
+    status = 402

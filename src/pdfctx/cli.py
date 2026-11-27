@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import textwrap
 from pathlib import Path
@@ -109,6 +110,22 @@ def cmd_serve_http(args) -> int:
     return 0
 
 
+def cmd_serve_cloud(args) -> int:
+    import logging
+
+    import uvicorn
+
+    from .cloud.app import create_cloud_app
+
+    logging.basicConfig(level=logging.INFO, format="%(name)s: %(message)s")
+    app = create_cloud_app(Path(args.data), args.public_url, host=args.host)
+    print(
+        f"pdfctx cloud {__version__} on http://{args.host}:{args.port} for {args.public_url}", file=sys.stderr
+    )
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning", proxy_headers=True)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pdfctx", description=__doc__)
     p.add_argument("--version", action="version", version=__version__)
@@ -157,6 +174,17 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--port", type=int, default=8000)
     sp.add_argument("--uploads", help="folder for POST /v1/documents uploads (disabled if not set)")
     sp.set_defaults(fn=cmd_serve_http)
+
+    sp = sub.add_parser("serve-cloud", help="the hosted app: accounts, one index per workspace, billing")
+    sp.add_argument("--data", default=os.environ.get("PDFCTX_DATA", "./pdfctx-data"), help="data folder")
+    sp.add_argument(
+        "--public-url",
+        default=os.environ.get("PDFCTX_PUBLIC_URL", "http://localhost:3000"),
+        help="the web app's URL (sign-in links and redirects point there)",
+    )
+    sp.add_argument("--host", default="127.0.0.1")
+    sp.add_argument("--port", type=int, default=8000)
+    sp.set_defaults(fn=cmd_serve_cloud)
     return p
 
 

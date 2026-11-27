@@ -7,11 +7,12 @@ import hashlib
 import io
 import os
 import re
+from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 import pypdfium2 as pdfium
-from fastapi import FastAPI, Query, Request
+from fastapi import APIRouter, Depends, FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from mcp.server.transport_security import TransportSecuritySettings
@@ -43,7 +44,18 @@ class ContextRequest(BaseModel):
     doc_ids: list[str] | None = None
 
 
+class HttpError(PdfctxError):
+    """An error with its own HTTP status (401, 402, 403, 413, 415 …)."""
+
+    def __init__(self, status: int, message: str):
+        super().__init__(message)
+        self.status = status
+
+
 def _status(e: PdfctxError) -> int:
+    status = getattr(e, "status", None)  # HttpError, QuotaExceeded (402) …
+    if isinstance(status, int):
+        return status
     return 404 if isinstance(e, NotFound) else 400
 
 
@@ -98,28 +110,8 @@ def _upload_name(raw: str, body: bytes) -> str:
     return f"{hashlib.sha256(body).hexdigest()[:12]}-{name}"
 
 
-def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.0.1") -> FastAPI:
-    _check_bind(host)
-    if upload_dir is not None:
-        up = Path(upload_dir).resolve()
-        for root in lib.roots:
-            r = Path(root).resolve()
-            if up == r or r in up.parents:
-                raise PdfctxError(f"the upload folder {up} must not be inside an indexed folder ({r})")
-    lib.hide_paths = True
-    if upload_dir is not None:
-        lib.display_roots.append(Path(upload_dir))
-    mcp = build_server(lib)
-    mcp_app = mcp.streamable_http_app(
-        streamable_http_path="/mcp", host=host, transport_security=_transport_security()
-    )
-
-    @contextlib.asynccontextmanager
-    async def lifespan(_app: FastAPI):
-        async with mcp.session_manager.run():
-            yield
-
-    app = FastAPI(title="pdfctx", version=__version__, lifespan=lifespan)
+def install_guard(app: FastAPI) -> None:
+    """Host/Origin checks on every route, JSON errors, and CORS for PDFCTX_WEB_ORIGIN."""
 
     @app.middleware("http")
     async def _rebinding_guard(request: Request, call_next):
@@ -134,7 +126,13 @@ def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.
 
     origin = os.environ.get("PDFCTX_WEB_ORIGIN")
     if origin:  # added after the guard, so it runs first and answers preflights
-        app.add_middleware(CORSMiddleware, allow_origins=[origin], allow_methods=["*"], allow_headers=["*"])
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=[origin],
+            allow_methods=["*"],
+            allow_headers=["*"],
+            allow_credentials=True,
+        )
 
     @app.exception_handler(PdfctxError)
     async def _pdfctx_error(_request: Request, exc: PdfctxError) -> JSONResponse:
@@ -144,36 +142,91 @@ def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.
     def healthz() -> dict:
         return {"ok": True, "version": __version__}
 
-    @app.get("/v1/documents")
-    def documents() -> dict:
+
+async def read_upload(request: Request) -> tuple[str, bytes, int]:
+    """(file name, bytes, page count) of a raw PDF request body, within the size and page limits."""
+    if request.headers.get("content-type", "").split(";")[0].strip().lower() != "application/pdf":
+        # Also forces a CORS preflight, so other sites cannot post here from a browser.
+        raise HttpError(415, "send the PDF with content-type: application/pdf")
+    try:
+        length = int(request.headers.get("content-length") or 0)
+    except ValueError as e:
+        raise HttpError(400, "invalid content-length") from e
+    if length > MAX_UPLOAD_BYTES:
+        raise HttpError(413, "file is larger than 20 MB")
+    body = bytearray()
+    async for chunk in request.stream():
+        body += chunk
+        if len(body) > MAX_UPLOAD_BYTES:
+            raise HttpError(413, "file is larger than 20 MB")
+    if bytes(body[:5]) != b"%PDF-":
+        raise HttpError(400, "not a PDF file")
+    data = bytes(body)
+    try:
+        with PDFIUM_LOCK:
+            pdf = pdfium.PdfDocument(data)
+            pages = len(pdf)
+            pdf.close()
+    except pdfium.PdfiumError as e:
+        raise HttpError(400, "the PDF cannot be opened") from e
+    if pages > MAX_UPLOAD_PAGES:
+        raise HttpError(413, f"PDF has {pages} pages; the limit is {MAX_UPLOAD_PAGES}")
+    return _upload_name(request.headers.get("x-filename", "upload.pdf"), data), data, pages
+
+
+def save_and_index(lib: Library, folder: Path, name: str, data: bytes) -> dict:
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / name
+    if not path.exists():
+        with open(path, "xb") as f:
+            f.write(data)
+    lib.index([path])
+    doc = lib.store.document_by_path(str(path.resolve()))
+    assert doc is not None
+    return {"id": doc.id, "title": doc.title, "pages": doc.pages, "status": doc.status}
+
+
+Uploader = Callable[[Library, str, bytes, int], dict]
+
+
+def rest_router(
+    get_lib: Callable[..., Library], uploader: Uploader | None, allow_delete: bool = False
+) -> APIRouter:
+    """The REST API over one Library, chosen per request by the `get_lib` dependency."""
+    r = APIRouter()
+    # A default, not Annotated[...]: with postponed annotations FastAPI resolves names from module globals.
+    dep = Depends(get_lib)
+
+    @r.get("/documents")
+    def documents(lib: Library = dep) -> dict:
         return lib.list_documents()
 
-    @app.get("/v1/documents/{doc_id}/outline")
-    def outline(doc_id: str, max_depth: int = 3) -> dict:
+    @r.get("/documents/{doc_id}/outline")
+    def outline(doc_id: str, max_depth: int = 3, lib: Library = dep) -> dict:
         return lib.outline(doc_id, max_depth)
 
-    @app.get("/v1/sections/{section_id}")
-    def section(section_id: str, max_tokens: int = 2000) -> dict:
+    @r.get("/sections/{section_id}")
+    def section(section_id: str, max_tokens: int = 2000, lib: Library = dep) -> dict:
         return lib.read_section(section_id, max_tokens)
 
-    @app.get("/v1/search")
-    def search(q: str, k: int = 8, doc_id: list[str] | None = Query(None)) -> dict:  # noqa: B008
+    @r.get("/search")
+    def search(q: str, k: int = 8, doc_id: list[str] | None = Query(None), lib: Library = dep) -> dict:  # noqa: B008
         return lib.search(q, doc_id, k)
 
-    @app.get("/v1/tables/{table_id}")
-    def table(table_id: str, format: str = "markdown") -> dict:
+    @r.get("/tables/{table_id}")
+    def table(table_id: str, format: str = "markdown", lib: Library = dep) -> dict:
         return lib.get_table(table_id, format)
 
-    @app.get("/v1/blocks/{block_id}/cite")
-    def cite(block_id: str) -> dict:
+    @r.get("/blocks/{block_id}/cite")
+    def cite(block_id: str, lib: Library = dep) -> dict:
         return lib.cite(block_id)
 
-    @app.get("/v1/audit")
-    def audit(limit: int = 100) -> dict:
+    @r.get("/audit")
+    def audit(limit: int = 100, lib: Library = dep) -> dict:
         return {"entries": lib.audit(limit)}
 
-    @app.post("/v1/metrics", response_model=None)
-    def metrics(body: MetricsRequest, format: str = "json") -> dict | Response:
+    @r.post("/metrics", response_model=None)
+    def metrics(body: MetricsRequest, format: str = "json", lib: Library = dep) -> dict | Response:
         out = lib.extract_metrics(body.metrics, body.years, body.doc_ids)
         if format == "csv":
             return Response(
@@ -183,12 +236,12 @@ def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.
             )
         return out
 
-    @app.post("/v1/context")
-    def context(body: ContextRequest) -> dict:
+    @r.post("/context")
+    def context(body: ContextRequest, lib: Library = dep) -> dict:
         return lib.context_pack(body.query, body.budget_tokens, body.doc_ids)
 
-    @app.get("/v1/documents/{doc_id}/pages/{page}.png")
-    def page_png(doc_id: str, page: int, scale: float = 1.5) -> Response:
+    @r.get("/documents/{doc_id}/pages/{page}.png")
+    def page_png(doc_id: str, page: int, scale: float = 1.5, lib: Library = dep) -> Response:
         doc = lib.store.get_document(doc_id)
         if not 0.25 <= scale <= 4:
             raise PdfctxError("scale must be between 0.25 and 4")
@@ -206,52 +259,57 @@ def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.
                 pdf.close()
         buf = io.BytesIO()
         image.save(buf, format="PNG")
-        return Response(buf.getvalue(), media_type="image/png", headers={"Cache-Control": "max-age=3600"})
-
-    @app.post("/v1/documents")
-    async def upload(request: Request) -> JSONResponse:
-        if upload_dir is None:
-            return JSONResponse({"error": "uploads are disabled on this server"}, status_code=403)
-        if request.headers.get("content-type", "").split(";")[0].strip().lower() != "application/pdf":
-            # Also forces a CORS preflight, so other sites cannot post here from a browser.
-            return JSONResponse({"error": "send the PDF with content-type: application/pdf"}, status_code=415)
-        try:
-            length = int(request.headers.get("content-length") or 0)
-        except ValueError:
-            return JSONResponse({"error": "invalid content-length"}, status_code=400)
-        if length > MAX_UPLOAD_BYTES:
-            return JSONResponse({"error": "file is larger than 20 MB"}, status_code=413)
-        body = bytearray()
-        async for chunk in request.stream():
-            body += chunk
-            if len(body) > MAX_UPLOAD_BYTES:
-                return JSONResponse({"error": "file is larger than 20 MB"}, status_code=413)
-        if bytes(body[:5]) != b"%PDF-":
-            return JSONResponse({"error": "not a PDF file"}, status_code=400)
-        data = bytes(body)
-        name = _upload_name(request.headers.get("x-filename", "upload.pdf"), data)
-        try:
-            with PDFIUM_LOCK:
-                pdf = pdfium.PdfDocument(data)
-                pages = len(pdf)
-                pdf.close()
-        except pdfium.PdfiumError:
-            return JSONResponse({"error": "the PDF cannot be opened"}, status_code=400)
-        if pages > MAX_UPLOAD_PAGES:
-            return JSONResponse(
-                {"error": f"PDF has {pages} pages; the limit is {MAX_UPLOAD_PAGES}"}, status_code=413
-            )
-        upload_dir.mkdir(parents=True, exist_ok=True)
-        path = upload_dir / name
-        if not path.exists():
-            with open(path, "xb") as f:
-                f.write(data)
-        await run_in_threadpool(lib.index, [path])
-        doc = lib.store.document_by_path(str(path.resolve()))
-        assert doc is not None
-        return JSONResponse(
-            {"id": doc.id, "title": doc.title, "pages": doc.pages, "status": doc.status}, status_code=201
+        return Response(
+            buf.getvalue(), media_type="image/png", headers={"Cache-Control": "private, max-age=3600"}
         )
 
+    @r.post("/documents")
+    async def upload(request: Request, lib: Library = dep) -> JSONResponse:
+        if uploader is None:
+            raise HttpError(403, "uploads are disabled on this server")
+        name, data, pages = await read_upload(request)
+        return JSONResponse(await run_in_threadpool(uploader, lib, name, data, pages), status_code=201)
+
+    if allow_delete:
+
+        @r.delete("/documents/{doc_id}")
+        def delete(doc_id: str, lib: Library = dep) -> dict:
+            doc = lib.store.get_document(doc_id)
+            Path(doc.path).unlink(missing_ok=True)
+            lib.refresh(force=True)
+            return {"deleted": doc_id}
+
+    return r
+
+
+def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.0.1") -> FastAPI:
+    _check_bind(host)
+    if upload_dir is not None:
+        up = Path(upload_dir).resolve()
+        for root in lib.roots:
+            rt = Path(root).resolve()
+            if up == rt or rt in up.parents:
+                raise PdfctxError(f"the upload folder {up} must not be inside an indexed folder ({rt})")
+    lib.hide_paths = True
+    if upload_dir is not None:
+        lib.display_roots.append(Path(upload_dir))
+    mcp = build_server(lib)
+    mcp_app = mcp.streamable_http_app(
+        streamable_http_path="/mcp", host=host, transport_security=_transport_security()
+    )
+
+    @contextlib.asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        async with mcp.session_manager.run():
+            yield
+
+    app = FastAPI(title="pdfctx", version=__version__, lifespan=lifespan)
+    install_guard(app)
+
+    def uploader(lib: Library, name: str, data: bytes, pages: int) -> dict:
+        assert upload_dir is not None
+        return save_and_index(lib, Path(upload_dir), name, data)
+
+    app.include_router(rest_router(lambda: lib, uploader if upload_dir is not None else None), prefix="/v1")
     app.mount("/", mcp_app)  # after the REST routes, so /mcp is the only path it serves
     return app
