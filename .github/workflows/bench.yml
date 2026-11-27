@@ -13,6 +13,8 @@ on:
 jobs:
   financebench:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v5
@@ -26,6 +28,13 @@ jobs:
           restore-keys: financebench-cc39aeb-
       - run: pip install -e ".[embed,dev]" pdf-mcp
       - run: python -m bench.financebench --systems "${{ inputs.systems }}" --scope "${{ inputs.scope }}" | tee bench-table.md
+      - name: Publish results to the bench-results branch (readable without artifact access)
+        run: |
+          mkdir -p /tmp/out && cp -r bench/results bench-table.md /tmp/out/ && cd /tmp/out
+          git init -q -b bench-results && git add -A
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com \
+            commit -qm "bench ${{ inputs.scope }} for ${GITHUB_SHA::7}: ${{ inputs.systems }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" bench-results
       - uses: actions/upload-artifact@v4
         with:
           name: bench-results
