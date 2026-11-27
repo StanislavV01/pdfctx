@@ -3,15 +3,15 @@
  "scope": "doc",
  "questions": 150,
  "metrics": {
-  "page_recall@1": 0.18,
-  "page_recall@3": 0.28,
-  "page_recall@5": 0.3133,
-  "page_recall@10": 0.44,
-  "mrr@10": 0.2467,
-  "tokens@5": 769.04,
-  "latency_p50_ms": 24.1368
+  "page_recall@1": 0.1667,
+  "page_recall@3": 0.2667,
+  "page_recall@5": 0.3333,
+  "page_recall@10": 0.46,
+  "mrr@10": 0.2416,
+  "tokens@5": 585.5,
+  "latency_p50_ms": 26.3977
  },
- "prepare_s": 200.0,
+ "prepare_s": 0.1,
  "version": "dev",
  "financebench_commit": "cc39aeb4afdf33909ee1412188bf89035950c2eb",
  "date": "2026-11-27",
@@ -25,10 +25,10 @@
    ],
    "top_pages": [
     49,
-    49,
+    41,
     43,
-    49,
-    41
+    90,
+    88
    ]
   },
   {
@@ -39,42 +39,42 @@
     58
    ],
    "top_pages": [
+    31,
+    88,
     99,
-    104,
-    84,
-    105,
-    110
+    44,
+    106
    ]
   },
   {
    "id": "financebench_id_00499",
    "kind": "domain-relevant",
-   "rank": null,
+   "rank": 4,
    "evidence": [
     48,
     50,
     52
    ],
    "top_pages": [
-    245,
-    244,
     28,
-    41,
-    61
+    39,
+    4,
+    50,
+    41
    ]
   },
   {
    "id": "financebench_id_01226",
    "kind": "domain-relevant",
-   "rank": 10,
+   "rank": 9,
    "evidence": [
     27
    ],
    "top_pages": [
     20,
-    24,
+    41,
     28,
-    118,
+    4,
     73
    ]
   },
@@ -87,10 +87,10 @@
    ],
    "top_pages": [
     28,
-    32,
-    19,
-    121,
-    63
+    64,
+    2,
+    5,
+    20
    ]
   },
   {
@@ -102,40 +102,40 @@
    ],
    "top_pages": [
     70,
-    34,
     57,
-    70,
+    34,
+    52,
     71
    ]
   },
   {
    "id": "financebench_id_00941",
    "kind": "domain-relevant",
-   "rank": 1,
+   "rank": 4,
    "evidence": [
     1
    ],
    "top_pages": [
-    1,
-    71,
-    19,
     70,
-    33
+    19,
+    71,
+    1,
+    73
    ]
   },
   {
    "id": "financebench_id_01858",
    "kind": "novel-generated",
-   "rank": 2,
+   "rank": null,
    "evidence": [
     62
    ],
    "top_pages": [
-    73,
-    62,
+    33,
     34,
-    63,
-    33
+    42,
+    7,
+    63
    ]
   },
   {
@@ -147,33 +147,33 @@
     70
    ],
    "top_pages": [
+    178,
+    132,
+    173,
     8,
-    65,
-    172,
-    124,
-    178
+    162
    ]
   },
   {
    "id": "financebench_id_07966",
    "kind": "metrics-generated",
-   "rank": 9,
+   "rank": null,
    "evidence": [
     70,
     73
    ],
    "top_pages": [
+    174,
     146,
-    65,
-    103,
-    104,
-    107
+    132,
+    162,
+    8
    ]
   },
   {
    "id": "financebench_id_04735",
    "kind": "metrics-generated",
-   "rank": null,
+   "rank": 4,
    "evidence": [
     59,
     63
@@ -181,9 +181,9 @@
    "top_pages": [
     53,
     104,
-    11,
-    16,
-    28
+    28,
+    59,
+    77
    ]
   },
   {
@@ -195,26 +195,26 @@
    ],
    "top_pages": [
     6,
+    15,
     102,
-    44,
     16,
-    15
+    9
    ]
   },
   {
    "id": "financebench_id_03856",
    "kind": "metrics-generated",
-   "rank": 10,
+   "rank": 2,
    "evidence": [
     57,
     61
    ],
    "top_pages": [
     54,
-    75,
-    40,
-    34,
-    49
+    61,
+    51,
+    55,
+    40
    ]
   },
   {
@@ -225,11 +225,11 @@
     54
    ],
    "top_pages": [
-    64,
+    9,
+    38,
     12,
-    99,
-    23,
-    38
+    7,
+    10
    ]
   },
   {
@@ -242,9 +242,9 @@
    "top_pages": [
     10,
     11,
-    10,
-    11,
-    15
+    9,
+    7,
+    12
    ]
   },
   {
@@ -256,118 +256,118 @@
    ],
    "top_pages": [
     132,
-    132,
     202,
     84,
-    202
+    180,
+    86
    ]
   },
   {
    "id": "financebench_id_00540",
    "kind": "domain-relevant",
-   "rank": null,
+   "rank": 1,
    "evidence": [
     130,
     132
    ],
    "top_pages": [
-    5,
-    36,
-    212,
+    132,
     209,
-    30
+    210,
+    167,
+    5
    ]
   },
   {
    "id": "financebench_id_10420",
    "kind": "metrics-generated",
-   "rank": null,
+   "rank": 8,
    "evidence": [
     130,
     132
    ],
    "top_pages": [
-    207,
+    111,
     162,
-    111,
-    111,
-    86
+    19,
+    86,
+    18
    ]
   },
   {
    "id": "financebench_id_06655",
    "kind": "metrics-generated",
-   "rank": 8,
+   "rank": null,
    "evidence": [
     38,
     40
    ],
    "top_pages": [
     20,
-    80,
-    19,
-    1,
-    20
+    77,
+    61,
+    5,
+    1
    ]
   },
   {
    "id": "financebench_id_08135",
    "kind": "metrics-generated",
-   "rank": null,
+   "rank": 9,
    "evidence": [
     38
    ],
    "top_pages": [
     81,
-    81,
-    48,
     80,
-    74
+    74,
+    68,
+    3
    ]
   },
   {
    "id": "financebench_id_08286",
    "kind": "metrics-generated",
-   "rank": 10,
+   "rank": 2,
    "evidence": [
     38
    ],
    "top_pages": [
-    39,
-    35,
+    73,
+    38,
     72,
-    37,
-    41
+    1,
+    79
    ]
   },
   {
    "id": "financebench_id_03882",
    "kind": "metrics-generated",
-   "rank": 1,
+   "rank": 7,
    "evidence": [
     50
    ],
    "top_pages": [
-    50,
     89,
-    2,
-    111,
-    77
+    122,
+    77,
+    190,
+    118
    ]
   },
   {
    "id": "financebench_id_01935",
    "kind": "novel-generated",
-   "rank": 2,
+   "rank": 3,
    "evidence": [
     2
    ],
    "top_pages": [
-    3,
-    2,
     4,
     7,
-    7
+    2,
+    3,
+    6
    ]
   },
   {
@@ -380,9 +380,9 @@
    "top_pages": [
     114,
     123,
-    115,
     37,
-    109
+    55,
+    152
    ]
   },
   {
@@ -393,10 +393,10 @@
     64
    ],
    "top_pages": [
-    104,
+    152,
     37,
-    152,
-    152,
+    114,
+    147,
     151
    ]
   },
@@ -408,11 +408,11 @@
     5
    ],
    "top_pages": [
-    14,
-    104,
-    9,
+    152,
     37,
-    152
+    114,
+    147,
+    151
    ]
   },
   {
@@ -423,56 +423,56 @@
     50
    ],
    "top_pages": [
-    134,
+    152,
+    37,
+    151,
     4,
-    114,
-    104,
-    37
+    114
    ]
   },
   {
    "id": "financebench_id_01936",
    "kind": "novel-generated",
-   "rank": 1,
+   "rank": 3,
    "evidence": [
     15
    ],
    "top_pages": [
-    15,
     54,
     44,
-    44,
-    54
+    15,
+    7,
+    10
    ]
   },
   {
    "id": "financebench_id_01928",
    "kind": "novel-generated",
-   "rank": null,
+   "rank": 9,
    "evidence": [
     12
    ],
    "top_pages": [
     1,
-    1,
     7,
     2,
-    1
+    5,
+    11
    ]
   },
   {
    "id": "financebench_id_01930",
    "kind": "novel-generated",
-   "rank": 3,
+   "rank": 10,
    "evidence": [
     10
    ],
    "top_pages": [
+    2,
     3,
-    2,
-    10,
-    2,
-    1
+    7,
+    1,
+    4
    ]
   },
   {
@@ -485,10 +485,10 @@
    ],
    "top_pages": [
     101,
-    102,
     205,
-    101,
-    101
+    102,
+    99,
+    17
    ]
   },
   {
@@ -500,25 +500,25 @@
    ],
    "top_pages": [
     11,
-    11,
-    44,
-    110,
+    7,
+    8,
+    9,
     5
    ]
   },
   {
    "id": "financebench_id_00995",
    "kind": "domain-relevant",
-   "rank": null,
+   "rank": 9,
    "evidence": [
     4
    ],
    "top_pages": [
     11,
-    11,
-    60,
     9,
-    11
+    44,
+    7,
+    8
    ]
   },
   {
@@ -530,10 +530,10 @@
    ],
    "top_pages": [
     11,
-    11,
+    7,
+    8,
     44,
-    110,
-    5
+    9
    ]
   },
   {
@@ -544,26 +544,26 @@
     43
    ],
    "top_pages": [
+    11,
     9,
-    26,
-    11,
-    11,
+    7,
+    8,
     44
    ]
   },
   {
    "id": "financebench_id_01279",
    "kind": "domain-relevant",
-   "rank": 4,
+   "rank": 2,
    "evidence": [
     58
    ],
    "top_pages": [
     51,
-    59,
-    51,
     58,
-    58
+    59,
+    37,
+    52
    ]
   },
   {
@@ -574,11 +574,11 @@
     48
    ],
    "top_pages": [
-    9,
-    11,
     11,
     44,
-    6
+    9,
+    75,
+    49
    ]
   },
   {
@@ -589,26 +589,26 @@
     12
    ],
    "top_pages": [
-    102,
+    11,
+    101,
     4,
-    11,
-    11,
-    104
+    7,
+    44
    ]
   },
   {
    "id": "financebench_id_00476",
    "kind": "domain-relevant",
-   "rank": 10,
+   "rank": null,
    "evidence": [
     1
    ],
    "top_pages": [
+    150,
+    252,
     65,
-    150,
-    150,
-    254,
-    68
+    159,
+    188
    ]
   },
   {
@@ -619,11 +619,11 @@
     155
    ],
    "top_pages": [
-    65,
-    254,
     252,
+    150,
+    65,
     253,
-    252
+    69
    ]
   },
   {
@@ -635,10 +635,10 @@
    ],
    "top_pages": [
     236,
+    194,
+    225,
     253,
-    255,
-    226,
-    236
+    226
    ]
   },
   {
@@ -649,11 +649,11 @@
     96
    ],
    "top_pages": [
-    252,
     253,
+    150,
     65,
-    254,
-    176
+    68,
+    252
    ]
   },
   {
@@ -664,11 +664,11 @@
     44
    ],
    "top_pages": [
-    65,
-    254,
+    69,
+    253,
     150,
     252,
-    253
+    188
    ]
   },
   {
@@ -681,9 +681,9 @@
    "top_pages": [
     253,
     252,
-    254,
-    253,
-    65
+    65,
+    150,
+    69
    ]
   },
   {
@@ -694,73 +694,73 @@
     45
    ],
    "top_pages": [
-    86,
-    85,
-    102,
     7,
-    254
+    85,
+    252,
+    29,
+    65
    ]
   },
   {
    "id": "financebench_id_05718",
    "kind": "metrics-generated",
-   "rank": 1,
+   "rank": 9,
    "evidence": [
     86
    ],
    "top_pages": [
-    86,
-    135,
     145,
+    135,
     1,
-    139
+    147,
+    151
    ]
   },
   {
    "id": "financebench_id_04254",
    "kind": "metrics-generated",
-   "rank": 1,
+   "rank": 2,
    "evidence": [
     86,
     88
    ],
    "top_pages": [
-    88,
-    87,
     143,
-    144,
-    143
+    88,
+    145,
+    86,
+    1
    ]
   },
   {
    "id": "financebench_id_00070",
    "kind": "domain-relevant",
-   "rank": 3,
+   "rank": null,
    "evidence": [
     81,
     82
    ],
    "top_pages": [
-    300,
-    83,
-    81,
-    82,
-    140
+    301,
+    140,
+    87,
+    148,
+    158
    ]
   },
   {
    "id": "financebench_id_02608",
    "kind": "metrics-generated",
-   "rank": 9,
+   "rank": null,
    "evidence": [
     56
    ],
    "top_pages": [
     96,
+    19,
     97,
-    37,
-    21,
-    96
+    81,
+    104
    ]
   },
   {
@@ -771,11 +771,11 @@
     52
    ],
    "top_pages": [
-    35,
-    32,
     82,
-    82,
-    19
+    19,
+    20,
+    101,
+    81
    ]
   },
   {
@@ -786,11 +786,11 @@
     40
    ],
    "top_pages": [
-    27,
     69,
-    69,
+    66,
+    70,
     22,
-    66
+    27
    ]
   },
   {
@@ -802,55 +802,55 @@
    ],
    "top_pages": [
     69,
-    69,
-    69,
-    27,
-    1
+    70,
+    66,
+    19,
+    44
    ]
   },
   {
    "id": "financebench_id_01275",
    "kind": "domain-relevant",
-   "rank": 7,
+   "rank": 8,
    "evidence": [
     42
    ],
    "top_pages": [
+    69,
     29,
-    69,
-    22,
-    69,
-    69
+    70,
+    66,
+    44
    ]
   },
   {
    "id": "financebench_id_00288",
    "kind": "novel-generated",
-   "rank": 2,
+   "rank": 1,
    "evidence": [
     20
    ],
    "top_pages": [
-    8,
     20,
     21,
-    20,
-    20
+    8,
+    22,
+    10
    ]
   },
   {
    "id": "financebench_id_00460",
    "kind": "novel-generated",
-   "rank": 2,
+   "rank": 1,
    "evidence": [
     17
    ],
    "top_pages": [
-    19,
     17,
-    1,
     2,
-    26
+    19,
+    1,
+    27
    ]
   },
   {
@@ -861,26 +861,26 @@
     18
    ],
    "top_pages": [
-    1,
     2,
-    26,
     19,
-    27
+    17,
+    13,
+    1
    ]
   },
   {
    "id": "financebench_id_04660",
    "kind": "metrics-generated",
-   "rank": 4,
+   "rank": 2,
    "evidence": [
     68
    ],
    "top_pages": [
     41,
-    83,
-    41,
     68,
-    117
+    25,
+    7,
+    61
    ]
   },
   {
@@ -892,24 +892,24 @@
    ],
    "top_pages": [
     139,
-    20,
     59,
-    139,
-    57
+    9,
+    21,
+    22
    ]
   },
   {
    "id": "financebench_id_07661",
    "kind": "metrics-generated",
-   "rank": 6,
+   "rank": 2,
    "evidence": [
     90
    ],
    "top_pages": [
     74,
-    74,
-    134,
+    90,
     138,
+    12,
     59
    ]
   },
@@ -922,10 +922,10 @@
    ],
    "top_pages": [
     85,
-    85,
-    4,
-    53,
-    131
+    110,
+    72,
+    57,
+    127
    ]
   },
   {
@@ -936,11 +936,11 @@
     62
    ],
    "top_pages": [
-    175,
-    150,
-    149,
     3,
-    29
+    149,
+    175,
+    174,
+    145
    ]
   },
   {
@@ -952,10 +952,10 @@
    ],
    "top_pages": [
     149,
-    185,
-    5,
-    146,
-    149
+    145,
+    175,
+    61,
+    5
    ]
   },
   {
@@ -966,11 +966,11 @@
     55
    ],
    "top_pages": [
+    145,
+    149,
     175,
-    30,
-    146,
-    185,
-    145
+    61,
+    3
    ]
   },
   {
@@ -983,11 +983,11 @@
     14
    ],
    "top_pages": [
-    19,
-    185,
     3,
+    61,
     145,
-    175
+    19,
+    185
    ]
   },
   {
@@ -998,26 +998,26 @@
     8
    ],
    "top_pages": [
-    62,
-    185,
-    3,
+    175,
     145,
-    175
+    3,
+    174,
+    129
    ]
   },
   {
    "id": "financebench_id_00494",
    "kind": "novel-generated",
-   "rank": 3,
+   "rank": 1,
    "evidence": [
     9
    ],
    "top_pages": [
-    33,
-    185,
     9,
-    9,
-    145
+    145,
+    61,
+    35,
+    3
    ]
   },
   {
@@ -1028,11 +1028,11 @@
     55
    ],
    "top_pages": [
-    147,
     145,
-    132,
-    185,
-    3
+    3,
+    142,
+    129,
+    175
    ]
   },
   {
@@ -1044,42 +1044,42 @@
     76
    ],
    "top_pages": [
-    29,
     175,
+    82,
     127,
-    175,
-    82
+    29,
+    158
    ]
   },
   {
    "id": "financebench_id_09724",
    "kind": "metrics-generated",
-   "rank": 8,
+   "rank": 9,
    "evidence": [
     62
    ],
    "top_pages": [
+    108,
     163,
     164,
-    108,
-    87,
+    111,
     6
    ]
   },
   {
    "id": "financebench_id_06272",
    "kind": "metrics-generated",
-   "rank": 1,
+   "rank": 3,
    "evidence": [
     63,
     66
    ],
    "top_pages": [
+    108,
+    109,
     63,
     64,
-    108,
-    67,
-    108
+    4
    ]
   },
   {
@@ -1092,10 +1092,10 @@
    ],
    "top_pages": [
     43,
+    86,
     31,
-    43,
-    126,
-    59
+    121,
+    84
    ]
   },
   {
@@ -1107,10 +1107,10 @@
    ],
    "top_pages": [
     65,
-    32,
-    36,
+    56,
+    30,
     28,
-    79
+    32
    ]
   },
   {
@@ -1121,11 +1121,11 @@
     24
    ],
    "top_pages": [
-    2,
+    77,
+    52,
     26,
-    77,
-    77,
-    52
+    32,
+    50
    ]
   },
   {
@@ -1136,11 +1136,11 @@
     60
    ],
    "top_pages": [
+    34,
     2,
-    34,
-    79,
-    34,
-    50
+    90,
+    16,
+    79
    ]
   },
   {
@@ -1151,43 +1151,43 @@
     38
    ],
    "top_pages": [
-    19,
-    66,
     71,
-    71,
-    33
+    47,
+    5,
+    33,
+    36
    ]
   },
   {
    "id": "financebench_id_05915",
    "kind": "metrics-generated",
-   "rank": 9,
+   "rank": 1,
    "evidence": [
     302,
     304
    ],
    "top_pages": [
-    378,
-    384,
-    387,
-    383,
-    332
+    302,
+    327,
+    66,
+    181,
+    65
    ]
   },
   {
    "id": "financebench_id_00790",
    "kind": "domain-relevant",
-   "rank": 6,
+   "rank": 2,
    "evidence": [
     108,
     110
    ],
    "top_pages": [
-    204,
     66,
+    108,
     193,
-    66,
-    194
+    195,
+    68
    ]
   },
   {
@@ -1199,11 +1199,11 @@
     174
    ],
    "top_pages": [
-    193,
     66,
-    133,
-    67,
-    66
+    193,
+    70,
+    164,
+    68
    ]
   },
   {
@@ -1215,25 +1215,25 @@
    ],
    "top_pages": [
     68,
-    113,
+    193,
+    108,
     181,
-    182,
-    193
+    70
    ]
   },
   {
    "id": "financebench_id_00839",
    "kind": "novel-generated",
-   "rank": null,
+   "rank": 9,
    "evidence": [
     2
    ],
    "top_pages": [
     30,
     29,
-    30,
-    30,
-    31
+    5,
+    31,
+    1
    ]
   },
   {
@@ -1245,10 +1245,8 @@
    ],
    "top_pages": [
     2,
-    2,
-    2,
-    2,
-    2
+    1,
+    3
    ]
   },
   {
@@ -1260,11 +1258,11 @@
     55
    ],
    "top_pages": [
-    118,
-    1,
-    111,
-    135,
-    136
+    58,
+    136,
+    51,
+    84,
+    77
    ]
   },
   {
@@ -1275,42 +1273,42 @@
     50
    ],
    "top_pages": [
-    97,
     8,
-    4,
+    123,
+    74,
     53,
-    122
+    46
    ]
   },
   {
    "id": "financebench_id_04854",
    "kind": "metrics-generated",
-   "rank": 1,
+   "rank": 5,
    "evidence": [
     52
    ],
    "top_pages": [
-    52,
-    95,
     37,
-    49,
-    50
+    18,
+    123,
+    74,
+    52
    ]
   },
   {
    "id": "financebench_id_10136",
    "kind": "metrics-generated",
-   "rank": 10,
+   "rank": null,
    "evidence": [
     45,
     49
    ],
    "top_pages": [
-    18,
     70,
-    70,
-    71,
-    4
+    46,
+    17,
+    48,
+    43
    ]
   },
   {
@@ -1322,10 +1320,10 @@
    ],
    "top_pages": [
     13,
-    45,
-    115,
     114,
-    13
+    35,
+    1,
+    33
    ]
   },
   {
@@ -1337,10 +1335,10 @@
    ],
    "top_pages": [
     13,
-    45,
-    115,
-    13,
-    114
+    102,
+    105,
+    53,
+    1
    ]
   },
   {
@@ -1353,10 +1351,10 @@
    ],
    "top_pages": [
     13,
-    45,
-    115,
-    13,
-    71
+    105,
+    103,
+    1,
+    4
    ]
   },
   {
@@ -1368,25 +1366,25 @@
    ],
    "top_pages": [
     1,
-    1,
-    1,
+    5,
     2,
+    3,
     7
    ]
   },
   {
    "id": "financebench_id_01484",
    "kind": "novel-generated",
-   "rank": null,
+   "rank": 8,
    "evidence": [
     2
    ],
    "top_pages": [
-    3,
-    7,
+    1,
     13,
     14,
-    1
+    7,
+    3
    ]
   },
   {
@@ -1398,10 +1396,10 @@
    ],
    "top_pages": [
     4,
-    3,
-    8,
     2,
-    2
+    20,
+    8,
+    6
    ]
   },
   {
@@ -1413,10 +1411,10 @@
    ],
    "top_pages": [
     4,
+    25,
+    27,
     2,
-    25,
-    25,
-    25
+    26
    ]
   },
   {
@@ -1428,25 +1426,25 @@
    ],
    "top_pages": [
     4,
-    2,
     6,
-    4,
-    6
+    25,
+    2,
+    27
    ]
   },
   {
    "id": "financebench_id_01487",
    "kind": "novel-generated",
-   "rank": 2,
+   "rank": 1,
    "evidence": [
     10
    ],
    "top_pages": [
-    1,
     10,
+    1,
+    6,
     11,
-    7,
-    2
+    3
    ]
   },
   {
@@ -1457,11 +1455,11 @@
     19
    ],
    "top_pages": [
-    18,
-    167,
     31,
-    31,
-    28
+    28,
+    4,
+    143,
+    18
    ]
   },
   {
@@ -1473,10 +1471,10 @@
    ],
    "top_pages": [
     31,
-    31,
+    29,
+    22,
     1,
-    31,
-    24
+    75
    ]
   },
   {
@@ -1487,11 +1485,11 @@
     3
    ],
    "top_pages": [
-    1,
-    274,
     221,
-    221,
-    307
+    314,
+    132,
+    307,
+    272
    ]
   },
   {
@@ -1502,11 +1500,11 @@
     21
    ],
    "top_pages": [
-    1,
     4,
-    186,
     20,
-    177
+    158,
+    177,
+    178
    ]
   },
   {
@@ -1518,32 +1516,32 @@
    ],
    "top_pages": [
     85,
-    31,
     54,
-    85,
-    67
+    42,
+    84,
+    6
    ]
   },
   {
    "id": "financebench_id_10499",
    "kind": "metrics-generated",
-   "rank": 3,
+   "rank": null,
    "evidence": [
     50,
     52
    ],
    "top_pages": [
-    55,
     137,
-    52,
-    144,
-    151
+    136,
+    55,
+    6,
+    138
    ]
   },
   {
    "id": "financebench_id_04412",
    "kind": "metrics-generated",
-   "rank": 9,
+   "rank": 10,
    "evidence": [
     67,
     69
@@ -1553,36 +1551,36 @@
     111,
     110,
     117,
-    112
+    108
    ]
   },
   {
    "id": "financebench_id_03031",
    "kind": "metrics-generated",
-   "rank": 4,
+   "rank": 2,
    "evidence": [
     68
    ],
    "top_pages": [
     111,
-    112,
-    111,
     68,
-    67
+    114,
+    78,
+    96
    ]
   },
   {
    "id": "financebench_id_03718",
    "kind": "metrics-generated",
-   "rank": 9,
+   "rank": null,
    "evidence": [
     63
    ],
    "top_pages": [
-    107,
     108,
+    107,
     110,
-    114,
+    26,
     1
    ]
   },
@@ -1594,11 +1592,11 @@
     57
    ],
    "top_pages": [
+    187,
+    86,
     48,
     49,
-    142,
-    182,
-    86
+    188
    ]
   },
   {
@@ -1611,10 +1609,10 @@
    ],
    "top_pages": [
     51,
-    138,
-    133,
-    136,
-    134
+    66,
+    52,
+    96,
+    42
    ]
   },
   {
@@ -1626,25 +1624,25 @@
    ],
    "top_pages": [
     202,
-    205,
-    202,
-    59,
-    60
+    64,
+    3,
+    65,
+    200
    ]
   },
   {
    "id": "financebench_id_00382",
    "kind": "novel-generated",
-   "rank": 1,
+   "rank": 6,
    "evidence": [
     13
    ],
    "top_pages": [
-    13,
     14,
     4,
     15,
-    14
+    2,
+    8
    ]
   },
   {
@@ -1656,16 +1654,16 @@
    ],
    "top_pages": [
     14,
+    7,
+    3,
     13,
-    4,
-    14,
-    7
+    4
    ]
   },
   {
    "id": "financebench_id_01912",
    "kind": "novel-generated",
-   "rank": 8,
+   "rank": 3,
    "evidence": [
     3,
     4
@@ -1673,9 +1671,9 @@
    "top_pages": [
     14,
     13,
-    12,
-    11,
-    13
+    4,
+    7,
+    1
    ]
   },
   {
@@ -1688,9 +1686,9 @@
    "top_pages": [
     10,
     11,
-    11,
-    10,
-    18
+    18,
+    38,
+    19
    ]
   },
   {
@@ -1701,11 +1699,11 @@
     52
    ],
    "top_pages": [
-    8,
-    120,
-    121,
     13,
-    58
+    8,
+    15,
+    14,
+    105
    ]
   },
   {
@@ -1716,11 +1714,11 @@
     60
    ],
    "top_pages": [
-    43,
-    106,
-    103,
+    107,
     105,
-    107
+    103,
+    106,
+    104
    ]
   },
   {
@@ -1732,26 +1730,26 @@
     42
    ],
    "top_pages": [
-    27,
+    39,
     69,
-    38,
-    3,
-    39
+    17,
+    27,
+    34
    ]
   },
   {
    "id": "financebench_id_03282",
    "kind": "metrics-generated",
-   "rank": 6,
+   "rank": 5,
    "evidence": [
     45
    ],
    "top_pages": [
-    51,
-    69,
     70,
-    53,
-    70
+    69,
+    73,
+    54,
+    45
    ]
   },
   {
@@ -1762,26 +1760,26 @@
     46
    ],
    "top_pages": [
-    19,
     8,
-    75,
+    19,
     85,
-    78
+    83,
+    4
    ]
   },
   {
    "id": "financebench_id_03531",
    "kind": "metrics-generated",
-   "rank": 8,
+   "rank": 5,
    "evidence": [
     54
    ],
    "top_pages": [
-    77,
+    83,
     82,
-    64,
-    39,
-    62
+    5,
+    77,
+    54
    ]
   },
   {
@@ -1793,11 +1791,11 @@
     61
    ],
    "top_pages": [
-    84,
-    36,
-    12,
+    35,
+    45,
     31,
-    35
+    38,
+    89
    ]
   },
   {
@@ -1810,9 +1808,9 @@
    "top_pages": [
     62,
     93,
-    62,
-    62,
-    93
+    6,
+    5,
+    88
    ]
   },
   {
@@ -1823,11 +1821,11 @@
     61
    ],
    "top_pages": [
-    70,
-    8,
-    24,
     12,
-    51
+    70,
+    129,
+    84,
+    24
    ]
   },
   {
@@ -1839,10 +1837,10 @@
    ],
    "top_pages": [
     54,
-    541,
-    54,
     543,
-    109
+    544,
+    109,
+    541
    ]
   },
   {
@@ -1854,11 +1852,11 @@
     5
    ],
    "top_pages": [
-    488,
-    489,
-    90,
     109,
-    490
+    498,
+    27,
+    497,
+    488
    ]
   },
   {
@@ -1870,41 +1868,41 @@
    ],
    "top_pages": [
     37,
-    37,
-    266,
     497,
-    202
+    498,
+    27,
+    266
    ]
   },
   {
    "id": "financebench_id_01328",
    "kind": "domain-relevant",
-   "rank": 1,
+   "rank": null,
    "evidence": [
     78
    ],
    "top_pages": [
-    78,
+    498,
     49,
-    107,
     72,
-    498
+    497,
+    56
    ]
   },
   {
    "id": "financebench_id_03620",
    "kind": "metrics-generated",
-   "rank": 3,
+   "rank": 9,
    "evidence": [
     62,
     64
    ],
    "top_pages": [
-    47,
-    100,
-    64,
     54,
-    111
+    47,
+    111,
+    103,
+    74
    ]
   },
   {
@@ -1916,11 +1914,11 @@
     64
    ],
    "top_pages": [
-    100,
     54,
-    487,
-    54,
-    489
+    111,
+    495,
+    47,
+    498
    ]
   },
   {
@@ -1932,10 +1930,10 @@
    ],
    "top_pages": [
     4,
-    4,
-    4,
-    4,
-    3
+    3,
+    5,
+    1,
+    2
    ]
   },
   {
@@ -1947,10 +1945,10 @@
    ],
    "top_pages": [
     2,
-    2,
-    165,
-    2,
-    85
+    85,
+    160,
+    81,
+    9
    ]
   },
   {
@@ -1962,29 +1960,14 @@
    ],
    "top_pages": [
     2,
-    2,
-    2,
-    2,
-    165
+    160,
+    104,
+    9,
+    85
    ]
   },
   {
    "id": "financebench_id_01474",
-   "kind": "novel-generated",
-   "rank": 1,
-   "evidence": [
-    1
-   ],
-   "top_pages": [
-    1,
-    10,
-    16,
-    12,
-    10
-   ]
-  },
-  {
-   "id": "financebench_id_01476",
    "kind": "novel-generated",
    "rank": 2,
    "evidence": [
@@ -1994,8 +1977,23 @@
     10,
     1,
     3,
+    16,
+    12
+   ]
+  },
+  {
+   "id": "financebench_id_01476",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    1
+   ],
+   "top_pages": [
     1,
-    2
+    3,
+    2,
+    10,
+    9
    ]
   },
   {
@@ -2006,102 +2004,102 @@
     59
    ],
    "top_pages": [
-    120,
     137,
-    117,
+    49,
     102,
-    137
+    60,
+    105
    ]
   },
   {
    "id": "financebench_id_00702",
    "kind": "novel-generated",
-   "rank": 2,
+   "rank": 1,
    "evidence": [
     57
    ],
    "top_pages": [
-    47,
     57,
-    99,
-    73,
-    112
+    112,
+    113,
+    47,
+    64
    ]
   },
   {
    "id": "financebench_id_02416",
    "kind": "novel-generated",
-   "rank": null,
+   "rank": 4,
    "evidence": [
     70,
     71
    ],
    "top_pages": [
     106,
-    139,
-    57,
-    58,
-    59
+    60,
+    72,
+    70,
+    105
    ]
   },
   {
    "id": "financebench_id_00283",
    "kind": "novel-generated",
-   "rank": 3,
+   "rank": 10,
    "evidence": [
     41
    ],
    "top_pages": [
     34,
-    37,
-    41,
+    50,
     14,
-    35
+    57,
+    37
    ]
   },
   {
    "id": "financebench_id_00724",
    "kind": "novel-generated",
-   "rank": 1,
+   "rank": 5,
    "evidence": [
     38
    ],
    "top_pages": [
-    38,
-    56,
     49,
-    49,
-    47
+    46,
+    40,
+    57,
+    38
    ]
   },
   {
    "id": "financebench_id_02419",
    "kind": "novel-generated",
-   "rank": 1,
+   "rank": 5,
    "evidence": [
     41
    ],
    "top_pages": [
-    41,
-    34,
-    68,
+    45,
     37,
-    45
+    52,
+    34,
+    41
    ]
   },
   {
    "id": "financebench_id_00746",
    "kind": "domain-relevant",
-   "rank": 4,
+   "rank": 1,
    "evidence": [
     1
    ],
    "top_pages": [
-    27,
-    80,
-    15,
     1,
-    81
+    101,
+    100,
+    9,
+    15
    ]
   },
   {
@@ -2113,10 +2111,10 @@
    ],
    "top_pages": [
     100,
+    101,
     9,
     10,
-    101,
-    16
+    91
    ]
   },
   {
@@ -2128,69 +2126,69 @@
    ],
    "top_pages": [
     2,
-    2,
-    3,
     6,
-    6
+    1,
+    9,
+    8
    ]
   },
   {
    "id": "financebench_id_00603",
    "kind": "novel-generated",
-   "rank": 10,
+   "rank": 7,
    "evidence": [
     3
    ],
    "top_pages": [
-    7,
-    4,
     9,
     8,
-    1
+    7,
+    1,
+    6
    ]
   },
   {
    "id": "financebench_id_00605",
    "kind": "novel-generated",
-   "rank": null,
+   "rank": 7,
    "evidence": [
     3
    ],
    "top_pages": [
-    4,
     9,
-    8,
     1,
-    1
+    8,
+    4,
+    6
    ]
   },
   {
    "id": "financebench_id_00606",
    "kind": "novel-generated",
-   "rank": null,
+   "rank": 6,
    "evidence": [
     2
    ],
    "top_pages": [
     9,
     1,
-    4,
-    9,
-    8
+    8,
+    6,
+    4
    ]
   },
   {
    "id": "financebench_id_00859",
    "kind": "novel-generated",
-   "rank": 2,
+   "rank": 1,
    "evidence": [
     85
    ],
    "top_pages": [
+    85,
     63,
-    85,
-    85,
     87,
+    46,
     47
    ]
   },
@@ -2203,11 +2201,11 @@
     94
    ],
    "top_pages": [
+    77,
     17,
-    77,
-    35,
-    77,
-    78
+    100,
+    4,
+    39
    ]
   },
   {
@@ -2218,10 +2216,10 @@
     56
    ],
    "top_pages": [
-    107,
-    42,
     11,
     10,
+    42,
+    107,
     116
    ]
   },
@@ -2234,11 +2232,11 @@
     56
    ],
    "top_pages": [
-    21,
     4,
     22,
-    59,
-    12
+    12,
+    5,
+    59
    ]
   },
   {
@@ -2249,11 +2247,11 @@
     77
    ],
    "top_pages": [
-    75,
+    18,
+    24,
+    25,
     34,
-    52,
-    31,
-    18
+    31
    ]
   },
   {
@@ -2265,32 +2263,32 @@
     59
    ],
    "top_pages": [
-    49,
-    64,
+    10,
     224,
-    54,
-    10
+    69,
+    49,
+    94
    ]
   },
   {
    "id": "financebench_id_04784",
    "kind": "metrics-generated",
-   "rank": null,
+   "rank": 3,
    "evidence": [
     48
    ],
    "top_pages": [
-    11,
-    29,
-    77,
     35,
-    82
+    77,
+    48,
+    11,
+    7
    ]
   },
   {
    "id": "financebench_id_06741",
    "kind": "metrics-generated",
-   "rank": 5,
+   "rank": 4,
    "evidence": [
     51,
     56
@@ -2298,9 +2296,9 @@
    "top_pages": [
     34,
     35,
-    34,
-    81,
-    56
+    86,
+    56,
+    81
    ]
   }
  ]

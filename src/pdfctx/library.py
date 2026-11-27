@@ -140,7 +140,7 @@ class Library:
         )
         return out
 
-    def _search(self, query: str, doc_ids: list[str] | None, k: int):
+    def _search(self, query: str, doc_ids: list[str] | None, k: int, per_page_cap: int | None = -1):
         if not isinstance(query, str) or not query.strip():
             raise PdfctxError("query must be a non-empty string")
         if doc_ids is not None:
@@ -220,7 +220,8 @@ class Library:
     def context_pack(self, query: str, budget_tokens: int = 4000, doc_ids: list[str] | None = None) -> dict:
         self.refresh()
         _check("budget_tokens", budget_tokens, 200, 50000)
-        hits = self._search(query, doc_ids, k=50)
+        # A pack may use several blocks from one page (a table row and the paragraph explaining it).
+        hits = self._search(query, doc_ids, k=50, per_page_cap=3)
         pack = ctx.context_pack(self.store, hits, budget_tokens)
         block_ids = [b["block_id"] for s in pack["sections"] for b in s["blocks"]]
         self._audit(

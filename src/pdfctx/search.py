@@ -101,10 +101,13 @@ class SearchConfig:
     bm25: bool = True
     vectors: bool = False
     rerank: bool = False
-    k_candidates: int = 50
+    # Defaults tuned on FinanceBench (doc scope) and rounded; see bench/results/CHANGELOG.md.
+    k_candidates: int = 200
     rerank_top: int = 30
-    context_weight: float = 0.5
+    context_weight: float = 1.0
     heading_weight: float = 0.5
+    page_boost: float = 1.0  # add this share of the best other match on the same page
+    per_page_cap: int | None = 1  # at most this many results from one page
 
 
 @dataclass
@@ -186,6 +189,23 @@ def search(
     for rowid, u in units.items():
         if blocks[u.block_id].kind == "heading":
             fused[rowid] *= cfg.heading_weight
+    if cfg.page_boost:
+        # Small-to-big: a block is stronger evidence when its page has other good matches. Use the best
+        # other match (not the sum), so a page full of weak boilerplate matches cannot win.
+        by_page: dict[tuple[str, int], list[float]] = {}
+        for rowid, u in units.items():
+            by_page.setdefault((u.doc_id, u.page), []).append(fused[rowid])
+        top2 = {k: sorted(v, reverse=True)[:2] for k, v in by_page.items()}
+
+        def best_other(r: int) -> float:
+            best = top2[(units[r].doc_id, units[r].page)]
+            return (
+                best[1]
+                if best[0] == fused[r] and len(best) > 1
+                else (best[0] if best[0] != fused[r] else 0.0)
+            )
+
+        fused = {r: v + cfg.page_boost * best_other(r) for r, v in fused.items()}
     ordered = sorted(fused, key=lambda r: (-fused[r], r))
 
     if cfg.rerank and reranker is not None and ordered:
@@ -197,14 +217,28 @@ def search(
         for pos, r in enumerate(reranked):
             fused[r] = 1.0 / (1 + pos)
 
+    # Show the most specific match: when a table matched as a whole and one of its rows matched too,
+    # return the best-scoring row (same page, far fewer tokens; get_table gives the full table).
+    best_row: dict[str, int] = {}
+    for r in ordered:
+        if units[r].kind == "row":
+            best_row.setdefault(units[r].block_id, r)
+
     hits: list[Hit] = []
     seen_blocks: set[str] = set()
+    per_page: dict[tuple[str, int], int] = {}
     for r in ordered:
         u = units[r]
         if u.block_id in seen_blocks:
             continue
+        if cfg.per_page_cap is not None and per_page.get((u.doc_id, u.page), 0) >= cfg.per_page_cap:
+            continue
+        per_page[(u.doc_id, u.page)] = per_page.get((u.doc_id, u.page), 0) + 1
         seen_blocks.add(u.block_id)
-        hits.append(Hit(u.id, u.block_id, u.doc_id, u.kind, round(fused[r], 6)))
+        score = round(fused[r], 6)
+        if u.kind == "table" and u.block_id in best_row:
+            u = units[best_row[u.block_id]]
+        hits.append(Hit(u.id, u.block_id, u.doc_id, u.kind, score))
         if len(hits) >= k:
             break
     return hits

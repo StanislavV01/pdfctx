@@ -135,3 +135,24 @@ def test_folder_walk_skips_hidden_and_index_dirs(store, tmp_path, report_pdf):
     shutil.copy(report_pdf, tmp_path / ".pdfctx" / "y.pdf")
     index_paths(store, [tmp_path])
     assert [d.path.split("/")[-1] for d in store.list_documents()] == ["Report.PDF"]
+
+
+def test_per_page_cap_spreads_results_across_pages(store, report_pdf):
+    index_paths(store, [report_pdf])
+    capped = search(store, "revenue region company year", k=6, config=SearchConfig(per_page_cap=1))
+    pages = [store.get_block(h.block_id).page for h in capped]
+    assert len(pages) == len(set(pages))
+
+
+def test_page_boost_prefers_pages_with_more_evidence(store, report_pdf):
+    index_paths(store, [report_pdf])
+    plain = search(store, "revenue", k=10, config=SearchConfig(page_boost=0.0, per_page_cap=None))
+    boosted = search(store, "revenue", k=10, config=SearchConfig(page_boost=1.0, per_page_cap=None))
+    assert {h.block_id for h in plain} == {h.block_id for h in boosted}
+    assert all(h.score > 0 for h in boosted)
+
+
+def test_boilerplate_page_does_not_beat_a_strong_match(store, report_pdf):
+    # page 1 has several weak "period" matches; the real answer is one strong match on page 4
+    index_paths(store, [report_pdf])
+    assert pdfgen.TERMINATION_SENTENCE in _top_text(store, search(store, "termination notice period"))

@@ -9,9 +9,9 @@
   "page_recall@10": 0.5067,
   "mrr@10": 0.2301,
   "tokens@5": 4615.4733,
-  "latency_p50_ms": 13.3177
+  "latency_p50_ms": 13.425
  },
- "prepare_s": 43.2,
+ "prepare_s": 44.0,
  "version": "",
  "financebench_commit": "cc39aeb4afdf33909ee1412188bf89035950c2eb",
  "date": "2026-11-27",
