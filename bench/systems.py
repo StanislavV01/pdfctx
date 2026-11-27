@@ -140,11 +140,29 @@ def make_system(name: str, bench_dir: Path) -> System:
         case "pdf-mcp":
             return PdfMcpSystem()
         case "pdfctx-structure":
-            return PdfctxSystem(name, IndexOptions(contextual=False, table_rows=False), index_dir=index_dir)
+            return PdfctxSystem(
+                name,
+                IndexOptions(contextual=False, table_rows=False),
+                SearchConfig(glossary=False),
+                index_dir=index_dir,
+            )
         case "pdfctx-context":
-            return PdfctxSystem(name, IndexOptions(contextual=True, table_rows=False), index_dir=index_dir)
+            return PdfctxSystem(
+                name,
+                IndexOptions(contextual=True, table_rows=False),
+                SearchConfig(glossary=False),
+                index_dir=index_dir,
+            )
         case "pdfctx-tables":
-            return PdfctxSystem(name, IndexOptions(contextual=True, table_rows=True), index_dir=index_dir)
+            return PdfctxSystem(
+                name,
+                IndexOptions(contextual=True, table_rows=True),
+                SearchConfig(glossary=False),
+                index_dir=index_dir,
+            )
+        case "pdfctx-glossary":
+            opts = IndexOptions(contextual=True, table_rows=True)
+            return PdfctxSystem(name, opts, SearchConfig(glossary=True), index_dir=index_dir)
         case "pdfctx-hybrid":
             opts = IndexOptions(embedder=get_embedder("fastembed"))
             return PdfctxSystem(name, opts, SearchConfig(vectors=True), index_dir=index_dir)

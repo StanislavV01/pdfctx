@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from .embed import Embedder, Reranker
 from .errors import PdfctxError
+from .glossary import expand
 from .store import Store
 
 _WORD = re.compile(r"\w+", re.UNICODE)
@@ -109,6 +110,7 @@ class SearchConfig:
     heading_weight: float = 0.5
     page_boost: float = 1.0  # add this share of the best other match on the same page
     per_page_cap: int | None = 1  # at most this many results from one page
+    glossary: bool = True  # expand finance terms into line-item words (glossary.py) for BM25
 
 
 @dataclass
@@ -177,7 +179,7 @@ def search(
 
     rankings: list[list[int]] = []
     if cfg.bm25:
-        rankings.append(_bm25(store, query, doc_ids, cfg))
+        rankings.append(_bm25(store, expand(query) if cfg.glossary else query, doc_ids, cfg))
     if cfg.vectors and embedder is not None:
         rankings.append(_dense(store, query, doc_ids, cfg, embedder))
 
