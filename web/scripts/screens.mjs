@@ -24,7 +24,7 @@ await page.goto(`${UI}/d/${encodeURIComponent(doc.id)}`, { waitUntil: "networkid
 await page.screenshot({ path: `${OUT}/2-viewer.png` });
 
 await page.getByPlaceholder(/Ask the document/).fill(QUERY);
-await page.getByRole("button", { name: "Search" }).click();
+await page.getByRole("button", { name: "Search", exact: true }).click();
 await page.getByText("context_pack").waitFor({ timeout: 30000 });
 await page.waitForLoadState("networkidle");
 await page.waitForTimeout(500);
