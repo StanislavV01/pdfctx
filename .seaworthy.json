@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "packageManager": "none",
+  "checks": [
+    {
+      "id": "lint",
+      "cmd": "ruff check . && ruff format --check .",
+      "script": "lint"
+    },
+    {
+      "id": "test",
+      "cmd": "python3 -m pytest -q",
+      "script": "test"
+    }
+  ],
+  "tiers": {
+    "fast": [
+      "lint"
+    ],
+    "commit": [
+      "lint",
+      "test"
+    ],
+    "push": [
+      "lint",
+      "test"
+    ]
+  },
+  "caps": {
+    "fixAttemptsPerCheck": 3,
+    "sameSignature": 2,
+    "reviewRounds": 2,
+    "ciCycles": 3,
+    "flakyRerunsPerSha": 1,
+    "stopBlocks": 5,
+    "checkTimeoutSec": 600,
+    "ciWatchSec": 540,
+    "ciTotalWaitMin": 30,
+    "runDiscoverySec": 180,
+    "excerptChars": 8000
+  },
+  "autonomy": "normal",
+  "allowedTrailers": []
+}
