@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 pytest.importorskip("fastapi")
@@ -62,7 +64,8 @@ def test_upload_limits(client, report_pdf):
     )
     assert r.status_code == 201 and r.json()["pages"] == 4
     files = [d["file"] for d in client.get("/v1/documents").json()["documents"]]
-    assert any(f.endswith("-_evil name.pdf") and "/uploads/" in f for f in files)
+    (up,) = [Path(f) for f in files if f.endswith("_evil name.pdf")]
+    assert up.parent.name == "uploads"  # the "../" did not escape the upload folder
 
 
 def test_upload_needs_pdf_content_type(client, report_pdf):
