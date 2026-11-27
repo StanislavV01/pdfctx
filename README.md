@@ -28,14 +28,16 @@ is involved and nothing is graded by a model.
 | system | R@1 | R@3 | R@5 | R@10 | MRR@10 | tokens for top-5 |
 |---|---|---|---|---|---|---|
 | page-level BM25 (what most "chat with PDF" tools do) | 0.147 | 0.233 | 0.360 | 0.507 | 0.230 | 4,615 |
-| pdfctx: structure | 0.167 | 0.267 | 0.333 | 0.460 | 0.242 | 586 |
-| pdfctx: + section context | 0.167 | 0.293 | 0.360 | 0.493 | 0.249 | 554 |
-| **pdfctx: + table rows (default)** | **0.160** | **0.307** | **0.400** | **0.553** | **0.263** | **461** |
+| pdfctx: structure | 0.160 | 0.267 | 0.333 | 0.453 | 0.237 | 586 |
+| pdfctx: + section context | 0.160 | 0.267 | 0.353 | 0.500 | 0.242 | 572 |
+| **pdfctx: + table rows (default)** | **0.167** | **0.313** | **0.393** | **0.567** | **0.270** | **461** |
 
 **pdfctx is ahead of the page baseline on every metric while handing the agent 10× fewer tokens.** Every
 change was kept or reverted based on these numbers. The log in
 [`bench/results/CHANGELOG.md`](bench/results/CHANGELOG.md) includes what did not work: summed page boosts lost
 to boilerplate, and document routing hurt corpus search. Defaults are rounded, not fitted to the 150 questions.
+
+Structure alone does not beat the baseline at R@5–10; the gain comes from table rows.
 
 The scores are low on purpose: FinanceBench is hard. Questions like *"what is 3M's FY2018 capital
 expenditure?"* do not say *"Purchases of property, plant and equipment"*, the line item that holds the answer.
@@ -44,8 +46,8 @@ which run locally through `pdfctx[embed]`, plus [`jztan/pdf-mcp`](https://github
 the same way. They run in the [Benchmark workflow](.github/workflows/bench.yml) and will be added here from
 its artifact.
 
-Corpus scope (search all 84 filings): R@10 0.193 vs 0.187 for the baseline at 12× fewer tokens, but rank-1 is
-lower (0.060 vs 0.093). Finding the right filing among 84 similar ones is the open problem
+Corpus scope (search all 84 filings): R@10 0.200 vs 0.187 for the baseline at 12× fewer tokens, but rank-1 is
+lower (0.073 vs 0.093). Finding the right filing among 84 similar ones is the open problem
 ([details](bench/results/CHANGELOG.md#corpus-scope-no-tuning-was-done-here)).
 
 ## Why it works

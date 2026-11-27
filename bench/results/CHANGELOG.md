@@ -48,7 +48,21 @@ Defaults were rounded (`page_boost=1.0`, not the best grid value 0.35), so they 
 | system | R@1 | R@3 | R@5 | R@10 | MRR | tok |
 |---|---|---|---|---|---|---|
 | baseline | 0.093 | 0.107 | 0.120 | 0.187 | 0.112 | 4791 |
-| pdfctx-tables | 0.060 | 0.113 | 0.147 | 0.193 | 0.098 | 399 |
+| pdfctx-tables | 0.073 | 0.127 | 0.147 | 0.200 | 0.108 | 399 |
 
 The result is mixed: higher recall@3–10 at 12× fewer tokens, but lower rank-1. Most misses come from finding the
 right filing among 84 similar 10-Ks. That is the next thing to work on, for example dense vectors.
+
+## Re-run after the index-version fix
+
+Earlier runs reused indexes built by an older parser, so parser fixes (year-as-section-number, table headers
+as headings) were not measured. `INDEX_VERSION` now forces a rebuild. Fresh numbers, single-document scope:
+
+| system | R@1 | R@3 | R@5 | R@10 | MRR | tok |
+|---|---|---|---|---|---|---|
+| baseline | 0.147 | 0.233 | 0.360 | 0.507 | 0.230 | 4615 |
+| pdfctx-structure | 0.160 | 0.267 | 0.333 | 0.453 | 0.237 | 586 |
+| pdfctx-context | 0.160 | 0.267 | 0.353 | 0.500 | 0.242 | 572 |
+| pdfctx-tables | 0.167 | 0.313 | 0.393 | 0.567 | 0.270 | 461 |
+
+The default improved slightly (R@10 0.553 → 0.567); the corpus table above is also from the fresh run.
