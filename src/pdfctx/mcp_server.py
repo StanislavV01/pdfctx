@@ -6,7 +6,7 @@ import functools
 from collections.abc import Callable
 from typing import Any
 
-from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver import Context, MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
@@ -54,7 +54,13 @@ TOOLS = [
 ]
 
 
-def build_server(lib: Library) -> MCPServer:
+LibraryResolver = Callable[[Context], Library]
+
+
+def build_server(lib: Library | LibraryResolver) -> MCPServer:
+    """`lib` is one Library (local use) or a function that picks the caller's Library from the request
+    (the cloud: one index per workspace, chosen by the API key in the Authorization header)."""
+    resolve: LibraryResolver = lib if callable(lib) and not isinstance(lib, Library) else (lambda _ctx: lib)
     server = MCPServer(name="pdfctx", title="pdfctx", instructions=INSTRUCTIONS, version=__version__)
     ro = ToolAnnotations(
         read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False
@@ -63,67 +69,67 @@ def build_server(lib: Library) -> MCPServer:
 
     @tool
     @_errors_as_tool_errors
-    def list_documents() -> dict[str, Any]:
+    def list_documents(ctx: Context) -> dict[str, Any]:
         """List every indexed PDF with its id, title, page count and status (ok, no_text, encrypted, failed).
         Start here when you do not know which documents exist."""
-        return lib.list_documents()
+        return resolve(ctx).list_documents()
 
     @tool
     @_errors_as_tool_errors
-    def outline(doc_id: str, max_depth: int = 3) -> dict[str, Any]:
+    def outline(ctx: Context, doc_id: str, max_depth: int = 3) -> dict[str, Any]:
         """Section tree (table of contents) of one document: section ids, titles, levels and pages.
         Use it to decide which section to read with read_section."""
-        return lib.outline(doc_id, max_depth)
+        return resolve(ctx).outline(doc_id, max_depth)
 
     @tool
     @_errors_as_tool_errors
-    def read_section(section_id: str, max_tokens: int = 2000) -> dict[str, Any]:
+    def read_section(ctx: Context, section_id: str, max_tokens: int = 2000) -> dict[str, Any]:
         """Read a whole section (including its sub-sections) in document order, up to max_tokens.
         If 'truncated' is true, the section continues after 'next_block_id'."""
-        return lib.read_section(section_id, max_tokens)
+        return resolve(ctx).read_section(section_id, max_tokens)
 
     @tool
     @_errors_as_tool_errors
-    def search(query: str, doc_ids: list[str] | None = None, k: int = 8) -> dict[str, Any]:
+    def search(ctx: Context, query: str, doc_ids: list[str] | None = None, k: int = 8) -> dict[str, Any]:
         """Find the most relevant blocks for a query: paragraphs, tables, or single table rows rendered with
         their column headers. Each result has page, bbox and section path.
         Restrict to documents with doc_ids."""
-        return lib.search(query, doc_ids, k)
+        return resolve(ctx).search(query, doc_ids, k)
 
     @tool
     @_errors_as_tool_errors
-    def get_table(table_id: str, format: str = "markdown") -> dict[str, Any]:
+    def get_table(ctx: Context, table_id: str, format: str = "markdown") -> dict[str, Any]:
         """A full table by its block id, as markdown or csv, with its caption and the sentence before it.
         Use this before quoting numbers."""
-        return lib.get_table(table_id, format)
+        return resolve(ctx).get_table(table_id, format)
 
     @tool
     @_errors_as_tool_errors
     def extract_metrics(
-        metrics: list[str], years: list[int] | None = None, doc_ids: list[str] | None = None
+        ctx: Context, metrics: list[str], years: list[int] | None = None, doc_ids: list[str] | None = None
     ) -> dict[str, Any]:
         """Financial metrics read from the filings' tables: one value per document, metric and year, each
         with its page, bbox, row label and the cell as printed. Known names: revenue, gross_profit,
         operating_income, net_income, eps_diluted, rnd, sga, depreciation_amortization, operating_cash_flow,
         capex, free_cash_flow, cash, total_assets, total_liabilities, long_term_debt, dividends_paid. Any
         other string is matched as a row label. Values not found are listed under `missing`, not estimated."""
-        return lib.extract_metrics(metrics, years, doc_ids)
+        return resolve(ctx).extract_metrics(metrics, years, doc_ids)
 
     @tool
     @_errors_as_tool_errors
-    def cite(block_id: str) -> dict[str, Any]:
+    def cite(ctx: Context, block_id: str) -> dict[str, Any]:
         """Exact citation for a block: document, file, page, bounding box (PDF points, top-left origin),
         section path and the verbatim text. Use it to give the user a verifiable source."""
-        return lib.cite(block_id)
+        return resolve(ctx).cite(block_id)
 
     @tool
     @_errors_as_tool_errors
     def context_pack(
-        query: str, budget_tokens: int = 4000, doc_ids: list[str] | None = None
+        ctx: Context, query: str, budget_tokens: int = 4000, doc_ids: list[str] | None = None
     ) -> dict[str, Any]:
         """The best evidence for a query within a token budget: matching rows with their headers, paragraphs
         and short neighbours, deduplicated, in document order and grouped by section.
         One call, ready to read."""
-        return lib.context_pack(query, budget_tokens, doc_ids)
+        return resolve(ctx).context_pack(query, budget_tokens, doc_ids)
 
     return server
