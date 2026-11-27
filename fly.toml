@@ -1,0 +1,29 @@
+# fly.io: `fly launch --no-deploy` once, then set secrets (see docs/DEPLOY.md) and `fly deploy`.
+app = "pdfctx"
+primary_region = "fra"
+
+[build]
+
+[env]
+  PDFCTX_DATA = "/data"
+  PDFCTX_EMBED = ""
+
+[[mounts]]
+  source = "pdfctx_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    path = "/api/healthz"
+    interval = "30s"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-2x"
+  memory = "2gb"

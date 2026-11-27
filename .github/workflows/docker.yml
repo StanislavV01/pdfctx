@@ -1,0 +1,19 @@
+name: Docker
+
+on:
+  push:
+    branches: [main]
+    paths: ["Dockerfile", "deploy/**", "src/**", "web/**", ".github/workflows/docker.yml"]
+  workflow_dispatch:
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build -t pdfctx-cloud .
+      - name: A small filing for the upload step
+        run: |
+          pip install -q reportlab pillow
+          python -c "from pathlib import Path; from tests.pdfgen import make_report; make_report(Path('/tmp/report.pdf'))"
+      - run: PDF=/tmp/report.pdf deploy/smoke.sh pdfctx-cloud
