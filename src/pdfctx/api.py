@@ -99,6 +99,9 @@ def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.
             r = Path(root).resolve()
             if up == r or r in up.parents:
                 raise PdfctxError(f"the upload folder {up} must not be inside an indexed folder ({r})")
+    lib.hide_paths = True
+    if upload_dir is not None:
+        lib.display_roots.append(Path(upload_dir))
     mcp = build_server(lib)
     mcp_app = mcp.streamable_http_app(
         streamable_http_path="/mcp", host=host, transport_security=_transport_security()

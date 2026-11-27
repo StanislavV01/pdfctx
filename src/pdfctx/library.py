@@ -46,12 +46,28 @@ class Library:
         self._lock = threading.RLock()
         self._last_refresh = 0.0
         self._fingerprint: tuple | None = None
+        # Set by servers that other machines can reach: report files relative to their folder, not as
+        # absolute server paths. Extra folders (such as the upload folder) count as roots for display only.
+        self.hide_paths = False
+        self.display_roots: list[Path] = []
         if self.roots:
             self.refresh(force=True)
 
     @property
     def embedder(self) -> Embedder | None:
         return self.options.embedder
+
+    def display_path(self, path: str) -> str:
+        if not self.hide_paths:
+            return path
+        p = Path(path).resolve()
+        for root in [*self.roots, *self.display_roots]:
+            r = Path(root).resolve()
+            if r == p:
+                return p.name
+            if r in p.parents:
+                return f"{r.name}/{p.relative_to(r).as_posix()}"
+        return p.name
 
     def close(self) -> None:
         self.store.close()
@@ -88,7 +104,7 @@ class Library:
             {
                 "id": d.id,
                 "title": d.title,
-                "file": d.path,
+                "file": self.display_path(d.path),
                 "pages": d.pages,
                 "status": d.status,
                 **({"error": d.error} if d.error else {}),
@@ -217,6 +233,7 @@ class Library:
     def cite(self, block_id: str) -> dict:
         self.refresh()
         out = ctx.cite(self.store, block_id)
+        out["file"] = self.display_path(out["file"])
         self._audit("cite", {"block_id": block_id}, [block_id], [out["doc_id"]])
         return out
 

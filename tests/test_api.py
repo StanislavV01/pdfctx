@@ -34,7 +34,7 @@ def test_rest_mirrors_tools(client):
     hit = client.get("/v1/search", params={"q": "termination notice"}).json()["results"][0]
     assert pdfgen.TERMINATION_SENTENCE in hit["text"]
     cite = client.get(f"/v1/blocks/{hit['block_id']}/cite").json()
-    assert cite["page"] == 4
+    assert cite["page"] == 4 and not cite["file"].startswith("/")  # no absolute server paths
     pack = client.post("/v1/context", json={"query": "South revenue 2024", "budget_tokens": 300}).json()
     assert pack["used_tokens"] <= 300
 

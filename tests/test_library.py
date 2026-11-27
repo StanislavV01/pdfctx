@@ -136,3 +136,16 @@ def test_context_pack_search_allows_several_blocks_per_page(lib):
 
     assert most_per_page(one) == 1
     assert most_per_page(many) > 1
+
+
+def test_hide_paths_reports_files_relative_to_their_root(tmp_path):
+    folder = tmp_path / "reports"
+    folder.mkdir()
+    pdfgen.make_report(folder / "sub.pdf")
+    lib = Library(tmp_path / "i.db", roots=[folder])
+    (doc,) = lib.list_documents()["documents"]
+    assert doc["file"] == str((folder / "sub.pdf").resolve()) or doc["file"].endswith("reports/sub.pdf")
+    lib.hide_paths = True
+    (doc,) = lib.list_documents()["documents"]
+    assert doc["file"] == "reports/sub.pdf"
+    lib.close()
