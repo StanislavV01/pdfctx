@@ -3,7 +3,7 @@ name: Web
 on:
   push:
     branches: [main]
-    paths: ["web/**", ".github/workflows/web.yml"]
+    paths: ["web/**", "src/pdfctx/**", ".github/workflows/web.yml"]
   pull_request:
     paths: ["web/**"]
   workflow_dispatch:
