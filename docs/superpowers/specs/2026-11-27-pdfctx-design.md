@@ -1,135 +1,107 @@
 # pdfctx: design
 
-**Status:** approved direction, v0.1 scope · **Date:** 2026-11-27 · **Author:** Stanislav
+**Status:** approved, v0.1 scope · **Date:** 2026-11-27 · **Author:** Stanislav
 
 ## 1. Problem
 
-Agents read PDFs badly. Chunk-and-embed RAG hands an agent five disconnected fragments: it loses the
-document's structure (which section is this, what came before), mangles tables, and gives citations
-nobody can check. Businesses add a second problem: they cannot see or control what an agent read.
+Agents read PDFs badly. Chunk-and-embed RAG hands an agent a few disconnected fragments: it loses
+the document's structure, mangles tables and gives citations nobody can check. Long, table-heavy
+documents (annual reports, contracts, manuals) are where this hurts most.
 
-## 2. Product
+Good open-source PDF MCP servers already exist. The strongest, `jztan/pdf-mcp`, does hybrid search,
+TOC, tables, OCR and folder search. pdfctx only matters if it **retrieves better and costs the agent
+fewer tokens, measured on a public benchmark**.
 
-pdfctx gives agents **structured, verifiable, accountable** access to PDFs.
+## 2. Goal
 
-- **Structured.** A document is a tree of sections with paragraphs and tables, not a bag of chunks.
-  The agent can look at the outline and read a section the way a person would.
-- **Verifiable.** Every block carries its file, page and bounding box. Any answer can be traced to
-  a highlighted rectangle on a page.
-- **Accountable.** Every tool call is written to an append-only audit log: who asked, what for,
-  and which blocks were returned.
+A PDF retrieval engine and MCP/REST server for agents that beats a page-level baseline and
+`pdf-mcp` on FinanceBench evidence-page recall at equal or lower returned tokens, and publishes
+the numbers.
 
-One Python package, three ways to run it (only the first is v0.1):
+## 3. Benchmark (built first)
 
-| Mode | Who | Where data lives | Version |
-|---|---|---|---|
-| Local CLI + stdio MCP | individuals, Claude Desktop / Cursor | user's machine | **v0.1** |
-| HTTP server (FastAPI REST + streamable-HTTP MCP) | demo, teams | our host (demo) or the client's | v0.1 (server code), v0.2 (hosted demo) |
-| Team features (collections, per-agent tokens, roles, SSO) | companies | client's cloud (Docker) | v0.3 |
+- **Data:** FinanceBench open set — 150 questions over 84 SEC filings, each with evidence page
+  numbers. PDFs and questions are downloaded by the benchmark script from
+  `github.com/patronus-ai/financebench` (CC BY-NC 4.0) and never committed here.
+- **Task:** for each question retrieve passages from its own document (doc-scoped, the FinanceBench
+  setting) and, as a harder variant, from the whole 84-document corpus.
+- **Metrics (no LLM, no keys):**
+  - `page_recall@k`, k ∈ {1, 3, 5, 10}: hit when any of the top-k passages lies on an evidence page
+    (and, corpus-wide, in the right document).
+  - `MRR@10` with the same hit definition.
+  - `tokens@5`: mean estimated tokens of the top-5 passages — what the agent pays to read them.
+  - p50 query latency.
+- **Optional end-to-end:** with an API key, answer from the top-k context and grade with an LLM
+  judge against the gold answer. Not part of CI.
+- **Systems:** (1) `baseline-page`: one passage per page, BM25; (2) pdfctx ablations adding one
+  technique at a time (§4); (3) `pdf-mcp` from PyPI, queried through its own search over the same
+  files and scored by the same metric, version pinned in the results file.
+- **Output:** `bench/results/<system>.json` and a markdown table the README embeds.
 
-## 3. v0.1 scope
+## 4. Retrieval techniques (each one measured)
 
-In scope:
+1. **Structure-aware units.** Headings, paragraphs and tables with page + bbox; running headers,
+   footers and page numbers removed; section tree from bookmarks or heading heuristics.
+2. **Contextual indexing.** Each unit is indexed with a prefix of document title + section path
+   (e.g. `3M 2018 10-K › Item 8 › Consolidated Statement of Cash Flows`). The prefix is used for
+   retrieval only, never shown as body text.
+3. **Table-first indexing.** Tables are indexed whole (lead-in sentence + header row) and row by
+   row, each row rendered with its column headers
+   (`Purchases of PP&E | 2018: (1,577) | 2017: (1,373)`), so a line-item question hits that row.
+4. **Hybrid + rerank.** BM25 (SQLite FTS5) + optional dense vectors (`fastembed`, bge-small) fused
+   with reciprocal rank fusion; optional ONNX cross-encoder rerank of the top 30. Without extras
+   everything still works on BM25.
+5. **Token-efficient answers.** `context_pack` returns matching rows with their table header and
+   surrounding section, deduplicated, in document order, within a token budget.
 
-1. Parse text-layer PDFs into blocks: headings, paragraphs, tables (as rows), with page + bbox.
-2. Remove running headers/footers and page numbers.
-3. Build a section tree: from PDF bookmarks when present, otherwise from heading heuristics.
-4. Index a folder or files into one SQLite database; re-index only changed files (content hash);
-   drop deleted files.
-5. Search: BM25 via SQLite FTS5 by default (no keys, no model download). Optional dense vectors
-   through a pluggable embedder (`pdfctx[embed]` → fastembed bge-small); hybrid via reciprocal
-   rank fusion.
-6. Agent tools (identical over MCP and REST):
-   - `list_documents()`
-   - `outline(doc_id, max_depth=3)`
-   - `read_section(section_id, max_tokens=2000)` (section ids embed the document id)
-   - `search(query, doc_ids=None, k=8)`
-   - `get_table(table_id, format="markdown"|"csv")`
-   - `cite(block_id)` → file, page, bbox, exact text
-   - `context_pack(query, budget_tokens=4000, doc_ids=None)` → deduplicated blocks in document
-     order, grouped under their section headings, each with a citation, fitting the budget.
-7. Audit log of every tool call (SQLite table) and `pdfctx audit` to read it.
-8. CLI: `index`, `serve` (stdio MCP), `serve-http` (FastAPI + MCP at `/mcp`), `search`, `outline`,
-   `audit`.
-9. FastAPI REST mirroring the tools, plus `POST /documents` upload with limits.
+## 5. Product surface
 
-Out of scope for v0.1: OCR/scanned PDFs (detected and reported as "no text layer"), DOCX/XLSX,
-auth and multi-tenant collections, the benchmark (v0.2), hosted deployment (v0.2), GUI app.
+Seven tools, identical over MCP (stdio and streamable HTTP), FastAPI REST and the CLI:
+`list_documents`, `outline(doc_id, max_depth)`, `read_section(section_id, max_tokens)`,
+`search(query, doc_ids, k)`, `get_table(table_id, format)`, `cite(block_id)` (file, page, bbox,
+exact text), `context_pack(query, budget_tokens, doc_ids)`.
 
-## 4. Architecture
+Every tool call is appended to an audit log (client, tool, returned blocks); `pdfctx audit` prints
+it — the base for v0.3 team features.
+
+CLI: `pdfctx index`, `serve` (stdio MCP), `serve-http` (REST at `/v1`, MCP at `/mcp`), `search`,
+`outline`, `audit`. One SQLite file per index, incremental by content hash.
+
+Out of scope for v0.1: OCR/scanned PDFs (reported as `no_text`), DOCX, auth, multi-tenant
+collections, hosted demo.
+
+## 6. Architecture
 
 ```
-pdfctx/
-  parse/      PDF -> ParsedDoc (blocks with page, bbox, font stats, tables)
-  outline     ParsedDoc -> Section tree, block -> section assignment
-  store       SQLite: documents, sections, blocks, blocks_fts (FTS5), vectors, audit
-  search      FTS5 BM25 + optional embedder, RRF fusion
-  context     read_section, cite, context_pack (token budgeting)
-  library     the one façade every interface calls; writes the audit log
-  mcp_server  MCPServer (mcp 2.x) tools over stdio / streamable HTTP
-  api         FastAPI app
-  cli         argparse entry point
+src/pdfctx/
+  parse/      lines, blocks, tables, pdf.parse_pdf -> ParsedDoc
+  outline.py  section tree + block assignment
+  units.py    retrieval units (block, table, table_row) + context prefix
+  store.py    SQLite: documents, sections, blocks, units, units_fts (FTS5), vectors, audit
+  indexer.py  incremental indexing of files/folders
+  embed.py    Embedder/Reranker protocols; Hash, FastEmbed implementations
+  search.py   BM25 / vector / RRF / rerank pipeline, configurable for ablations
+  context.py  read_section, cite, context_pack
+  library.py  façade used by every interface; writes the audit log
+  mcp_server.py, api.py, cli.py
+bench/
+  financebench.py, systems.py, results/
 ```
 
-`Library` is the only API the interfaces use, so MCP, REST and CLI cannot drift apart.
+Decisions:
 
-### Data model
+- SQLite FTS5, tokenizer `unicode61 remove_diacritics 2`; user text is reduced to word tokens and
+  OR-ed, so it never reaches FTS5 syntax.
+- Token estimate = `ceil(len(text) / 4)` everywhere, including when scoring `pdf-mcp`.
+- Pages are 1-based in pdfctx. FinanceBench `evidence_page_num` is 0-based; the benchmark converts
+  it once and a test pins the conversion against known evidence text.
 
-- `Document(id, path, sha256, title, pages, indexed_at, status, error)` — `id` is a short stable
-  hash of the absolute path; `status` ∈ `ok | no_text | encrypted | failed`.
-- `Section(id, doc_id, parent_id, level, title, page, order)` — `id` = `{doc_id}:s{n}`.
-- `Block(id, doc_id, section_id, kind, page, bbox, order, text, tokens)` — `kind` ∈
-  `heading | paragraph | table`; `id` = `{doc_id}:b{n}`; tables also keep `rows` (JSON).
-- `bbox` is `(x0, top, x1, bottom)` in PDF points, top-left origin (pdfplumber convention).
+## 7. Quality bar
 
-### Key decisions
-
-- **SQLite + FTS5** gives BM25 for free, one file per index, nothing to run. Tokenizer
-  `unicode61 remove_diacritics 2` so Polish/Ukrainian text matches without diacritics.
-- **User queries never reach FTS5 syntax.** Queries are reduced to word tokens and combined with
-  `OR`, so quotes, hyphens, `AND`, `NEAR`, `*` and `:` cannot raise errors or change semantics.
-- **Token estimate** = `ceil(len(text) / 4)`; documented as an estimate (no tokenizer dependency).
-- **Headings**: a line is a heading candidate if its font size is ≥ 1.15× the document's body
-  size (the most common size by character count), or it is bold and short (≤ 12 words) and
-  standalone, or it matches a numbering pattern (`1.`, `1.2`, `Article 5`, `§ 3`). Heading levels
-  are ranked by font size, then by numbering depth.
-- **Headers/footers**: lines in the top or bottom 8% of the page whose normalized text (digits
-  replaced by `#`) repeats on ≥ 50% of pages (min 3 pages) are dropped.
-- **Tables**: `pdfplumber.Page.find_tables()`; words inside a table bbox are excluded from
-  paragraphs; a table is kept only if it has ≥ 2 rows and ≥ 2 columns.
-- **Reading order**: blocks sorted by page, then column (detected by x-gaps ≥ 15% page width),
-  then top.
-- **Audit**: `(ts, client, tool, args_json, block_ids_json, doc_ids_json)`; append-only; the
-  library never updates or deletes rows.
-
-## 5. Interfaces
-
-- `pdfctx index PATH... [--db FILE]` — default DB `<first dir>/.pdfctx/index.db`, or
-  `./.pdfctx/index.db` for files.
-- `pdfctx serve PATH... [--db]` — index then serve MCP over stdio; files changed since the
-  last call are re-indexed lazily at the start of each tool call (mtime check, then hash).
-- `pdfctx serve-http PATH... [--host 127.0.0.1] [--port 8000]` — FastAPI with REST under `/v1`
-  and MCP streamable HTTP at `/mcp`.
-- REST: `GET /v1/documents`, `GET /v1/documents/{id}/outline`, `GET /v1/sections/{id}`,
-  `GET /v1/search?q=&k=`, `GET /v1/tables/{id}?format=`, `GET /v1/blocks/{id}/cite`,
-  `POST /v1/context`, `POST /v1/documents` (multipart upload; max 20 MB, max 300 pages,
-  PDF magic bytes required), `GET /healthz`.
-- Errors: tools return clear messages (`unknown section 'x'`, `document is encrypted`), never
-  stack traces.
-
-## 6. Quality bar
-
-- Python ≥ 3.11; dependencies: `pdfplumber`, `pypdf`, `mcp>=2.3,<3`, `fastapi`, `uvicorn`.
-  Optional extra `embed`: `fastembed`. Dev: `pytest`, `reportlab`, `ruff`, `httpx`.
-- Tests generate their PDFs with reportlab (deterministic headings, bookmarks, tables,
-  headers/footers, two columns, Polish text) and also run on real PDFs vendored from
-  pdfplumber's test-suite (MIT).
-- CI: ruff + pytest on Python 3.11 and 3.13, Ubuntu and macOS.
+- Python ≥ 3.11. Runtime deps: `pdfplumber`, `pypdf`, `mcp>=2.3,<3`, `fastapi`, `uvicorn`. Extra
+  `embed` = `fastembed`. Dev: `pytest`, `reportlab`, `ruff`, `httpx`.
+- Unit tests on reportlab-generated PDFs plus two MIT-licensed PDFs from pdfplumber's tests.
+- CI: ruff + pytest on 3.11/3.13 × Ubuntu/macOS; a manual workflow runs the full benchmark with
+  extras and `pdf-mcp`.
 - Commits: Conventional Commits, author `Stanislav <83041246+StanislavV01@users.noreply.github.com>`,
   no trailers.
-
-## 7. Later
-
-- v0.2: benchmark (chunk-RAG vs navigation on a fixed QA set; retrieval recall@k, answer
-  citation precision), hosted demo with preloaded documents, Dockerfile.
-- v0.3: collections, per-agent tokens, role filters applied inside `Library`, audit export.
