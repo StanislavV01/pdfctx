@@ -136,8 +136,11 @@ def _group_lines(words: list[Word], page_no: int) -> list[Line]:
 
 def page_lines(page: pdfium.PdfPage, page_no: int) -> list[Line]:
     """Lines in reading order; two-column pages are read left column first."""
-    words = page_words(page)
-    gutter = _gutter(words, page.get_width())
+    return lines_from_words(page_words(page), page.get_width(), page_no)
+
+
+def lines_from_words(words: list[Word], width: float, page_no: int) -> list[Line]:
+    gutter = _gutter(words, width)
     if gutter is None:
         return _group_lines(words, page_no)
     left = [w for w in words if (w.x0 + w.x1) / 2 < gutter]

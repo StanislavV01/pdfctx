@@ -18,6 +18,9 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
+      - name: tesseract for the OCR tests (skipped where it is missing)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y -qq tesseract-ocr > /dev/null
       - run: pip install -e ".[dev]"
       - run: ruff check .
       - run: ruff format --check .

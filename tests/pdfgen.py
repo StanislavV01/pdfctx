@@ -206,3 +206,27 @@ def make_inline_page_numbers(path: Path, pages: int = 3) -> Path:
             w.new_page()
     w.save()
     return path
+
+
+SCANNED_SENTENCE = "Capital expenditures were 1,577 million dollars in 2018"
+
+
+def make_scanned(path: Path) -> Path:
+    """A page that is only an image of text (no text layer), like a scan."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    dpi = 200
+    img = Image.new("RGB", (int(8.5 * dpi), int(11 * dpi)), "white")
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype(str(FONTS / "DejaVuSans.ttf"), 40)
+    bold = ImageFont.truetype(str(FONTS / "DejaVuSans-Bold.ttf"), 64)
+    draw.text((dpi, dpi), "Annual Report", font=bold, fill="black")
+    draw.text((dpi, dpi + 160), SCANNED_SENTENCE, font=font, fill="black")
+    draw.text((dpi, dpi + 230), "The board approved the plan in March.", font=font, fill="black")
+    png = path.with_suffix(".png")
+    img.save(png)
+    c = canvas.Canvas(str(path), pagesize=letter)
+    c.drawImage(str(png), 0, 0, width=letter[0], height=letter[1])
+    c.save()
+    png.unlink()
+    return path

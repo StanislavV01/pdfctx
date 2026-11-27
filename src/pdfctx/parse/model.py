@@ -81,3 +81,4 @@ class ParsedDoc:
     bookmarks: list[tuple[int, str, int]] = field(default_factory=list)  # (level 1-based, title, page)
     status: str = "ok"  # ok | no_text | encrypted | failed
     error: str | None = None
+    ocr_pages: list[int] = field(default_factory=list)  # pages whose text came from OCR

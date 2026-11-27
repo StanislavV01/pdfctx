@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .embed import Embedder
 from .outline import build_outline
-from .parse import parse_pdf
+from .parse import ocr, parse_pdf
 from .store import BlockRow, DocumentRow, SectionRow, Store
 from .units import make_units
 
@@ -34,6 +34,8 @@ class IndexOptions:
             "contextual": self.contextual,
             "table_rows": self.table_rows,
             "embedder": self.embedder.name if self.embedder else None,
+            # A scan indexed without OCR is re-indexed once tesseract is installed.
+            "ocr": ocr.available(),
             "v": INDEX_VERSION,
         }
         return hashlib.sha256(json.dumps(key, sort_keys=True).encode()).hexdigest()[:16]
