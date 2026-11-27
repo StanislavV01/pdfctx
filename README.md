@@ -129,6 +129,13 @@ claude mcp add pdfctx -- uvx --from git+https://github.com/StanislavV01/pdfctx p
 The folder is indexed on start, and files that are added, changed or deleted are re-indexed on the next tool
 call.
 
+**Try the web demo locally** (Python 3.11+, Node 20+). One command installs everything, indexes a real 10-K
+(or your folder) and opens the UI on http://localhost:3000:
+
+```bash
+./scripts/demo.sh                    # or: ./scripts/demo.sh ~/Documents/reports
+```
+
 **HTTP (REST + remote MCP)**
 
 ```bash
