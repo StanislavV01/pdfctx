@@ -1,8 +1,7 @@
-from pypdf import PdfReader
+import pypdfium2 as pdfium
 
 from pdfctx import __version__
 from pdfctx.cli import main
-from tests import pdfgen
 
 
 def test_version(capsys):
@@ -11,7 +10,7 @@ def test_version(capsys):
 
 
 def test_generated_report_contains_sentence(report_pdf):
-    reader = PdfReader(report_pdf)
-    assert len(reader.pages) == 4
-    assert pdfgen.TERMINATION_SENTENCE.split()[-1].rstrip(".") in reader.pages[3].extract_text()
-    assert len(reader.outline) >= 3
+    pdf = pdfium.PdfDocument(report_pdf)
+    assert len(pdf) == 4
+    assert "ninety days" in pdf[3].get_textpage().get_text_range()
+    assert len(list(pdf.get_toc())) == 5

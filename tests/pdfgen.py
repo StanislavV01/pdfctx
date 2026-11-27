@@ -193,3 +193,16 @@ def make_text_report(path: Path, sentence: str) -> Path:
     w.para(sentence + " " + FILLER)
     w.save()
     return path
+
+
+def make_inline_page_numbers(path: Path, pages: int = 3) -> Path:
+    """Page numbers printed right after the text (as HTML-to-PDF converters do), not in a footer band."""
+    w = _Writer(path, bookmarks=False, running=False)
+    for n in range(1, pages + 1):
+        w.para(f"Body text of page {n}. " + FILLER)
+        w.y -= 24
+        w.para(str(n))
+        if n < pages:
+            w.new_page()
+    w.save()
+    return path
