@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-from .errors import PdfctxError
+from .errors import NotFound
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS documents (
@@ -244,7 +244,7 @@ class Store:
     def _one(self, sql: str, args: tuple, what: str, key: str):
         row = self.db.execute(sql, args).fetchone()
         if row is None:
-            raise PdfctxError(f"unknown {what} '{key}'")
+            raise NotFound(f"unknown {what} '{key}'")
         return row
 
     @staticmethod

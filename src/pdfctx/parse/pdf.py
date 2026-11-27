@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 
 import pypdfium2 as pdfium
@@ -9,6 +10,9 @@ from .lines import drop_running_lines, page_lines
 from .model import ParsedDoc
 from .tables import find_tables
 
+# pdfium is not thread-safe: every call into it (parsing, page renders, page counts) holds this lock.
+PDFIUM_LOCK = threading.RLock()
+
 
 def _error(e: Exception) -> str:
     text = str(e).strip().splitlines()[0] if str(e).strip() else type(e).__name__
@@ -17,7 +21,11 @@ def _error(e: Exception) -> str:
 
 def parse_pdf(path: Path) -> ParsedDoc:
     """Parse a PDF into headings, paragraphs and tables. Never raises for a bad file."""
-    path = Path(path)
+    with PDFIUM_LOCK:
+        return _parse_locked(Path(path))
+
+
+def _parse_locked(path: Path) -> ParsedDoc:
     try:
         pdf = pdfium.PdfDocument(str(path))
     except pdfium.PdfiumError as e:

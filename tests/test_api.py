@@ -8,6 +8,7 @@ pytest.importorskip("httpx")
 from fastapi.testclient import TestClient
 
 from pdfctx.api import MAX_UPLOAD_BYTES, create_app
+from pdfctx.errors import PdfctxError
 from pdfctx.library import Library
 from tests import pdfgen
 
@@ -49,15 +50,71 @@ def test_errors_are_json(client):
     assert r.status_code == 400 and "k must be" in r.json()["error"]
 
 
+PDF = {"content-type": "application/pdf"}
+
+
 def test_upload_limits(client, report_pdf):
-    assert client.post("/v1/documents", content=b"hello").status_code == 400
+    assert client.post("/v1/documents", content=b"hello", headers=PDF).status_code == 400
     big = b"%PDF-" + b"0" * (MAX_UPLOAD_BYTES + 1)
-    assert client.post("/v1/documents", content=big).status_code == 413
+    assert client.post("/v1/documents", content=big, headers=PDF).status_code == 413
     r = client.post(
-        "/v1/documents", content=report_pdf.read_bytes(), headers={"x-filename": "../evil name.pdf"}
+        "/v1/documents", content=report_pdf.read_bytes(), headers={**PDF, "x-filename": "../evil name.pdf"}
     )
     assert r.status_code == 201 and r.json()["pages"] == 4
-    assert any(d["file"].endswith("_evil name.pdf") for d in client.get("/v1/documents").json()["documents"])
+    files = [d["file"] for d in client.get("/v1/documents").json()["documents"]]
+    assert any(f.endswith("-_evil name.pdf") and "/uploads/" in f for f in files)
+
+
+def test_upload_needs_pdf_content_type(client, report_pdf):
+    # A text/plain POST is a "simple" request that browsers send cross-site without a preflight.
+    r = client.post("/v1/documents", content=report_pdf.read_bytes(), headers={"content-type": "text/plain"})
+    assert r.status_code == 415
+
+
+def test_upload_same_name_does_not_overwrite(client, tmp_path):
+    a, b = tmp_path / "a.pdf", tmp_path / "b.pdf"
+    pdfgen.make_report(a)
+    pdfgen.make_two_column(b)
+    for f in (a, b):
+        r = client.post("/v1/documents", content=f.read_bytes(), headers={**PDF, "x-filename": "report.pdf"})
+        assert r.status_code == 201
+    assert len(list((tmp_path / "uploads").glob("*-report.pdf"))) == 2
+
+
+def test_upload_name_is_url_decoded(client, report_pdf):
+    r = client.post(
+        "/v1/documents",
+        content=report_pdf.read_bytes(),
+        headers={**PDF, "x-filename": "%D0%B7%D0%B2%D1%96%D1%82.pdf"},
+    )
+    assert r.status_code == 201
+    assert any(
+        f.endswith("-звіт.pdf") for f in (d["file"] for d in client.get("/v1/documents").json()["documents"])
+    )
+
+
+def test_rest_rejects_foreign_host_and_origin(client):
+    assert client.get("/v1/documents", headers={"host": "evil.example"}).status_code == 421
+    assert client.get("/v1/documents", headers={"origin": "https://evil.example"}).status_code == 403
+    assert client.get("/v1/documents", headers={"origin": "http://localhost:3000"}).status_code == 200
+
+
+def test_public_bind_requires_allowed_hosts(tmp_path, report_pdf, monkeypatch):
+    monkeypatch.delenv("PDFCTX_ALLOWED_HOSTS", raising=False)
+    lib = Library(tmp_path / "i.db", roots=[report_pdf])
+    with pytest.raises(PdfctxError, match="PDFCTX_ALLOWED_HOSTS"):
+        create_app(lib, host="0.0.0.0")
+    monkeypatch.setenv("PDFCTX_ALLOWED_HOSTS", "pdfctx.example.com")
+    with TestClient(create_app(lib, host="0.0.0.0"), base_url="https://pdfctx.example.com") as c:
+        assert c.get("/healthz").status_code == 200
+    lib.close()
+
+
+def test_upload_dir_inside_root_is_refused(tmp_path, report_pdf):
+    lib = Library(tmp_path / "i.db", roots=[tmp_path])
+    with pytest.raises(PdfctxError, match="must not be inside"):
+        create_app(lib, upload_dir=tmp_path / "uploads")
+    lib.close()
 
 
 def test_page_png_route(client):
