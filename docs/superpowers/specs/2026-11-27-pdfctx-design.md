@@ -70,6 +70,27 @@ CLI: `pdfctx index`, `serve` (stdio MCP), `serve-http` (REST at `/v1`, MCP at `/
 Out of scope for v0.1: OCR/scanned PDFs (reported as `no_text`), DOCX, auth, multi-tenant
 collections, hosted demo.
 
+## 5a. Decisions (agreed 2026-11-27)
+
+| Layer | Choice | Why / alternatives |
+|---|---|---|
+| Language, packaging | Python ≥ 3.11, uv, PyPI, `uvx pdfctx` | RAG ecosystem; one-command install |
+| PDF parsing | pypdfium2 + own layout and table detection | ~20× faster than pdfminer; Docling too heavy, PyMuPDF is AGPL, LlamaParse is cloud |
+| Index | SQLite file: FTS5 (BM25) + vectors | zero ops; Postgres/pgvector later for teams |
+| Embeddings | local `fastembed` (bge-small) by default; OpenAI / Voyage via API key, optional | private and free by default; the benchmark compares both |
+| Rerank | local ONNX bge-reranker by default; Cohere / Voyage via API key, optional | same |
+| LLM | none in the core; the user's agent answers. LLM judge only in the optional benchmark run | no token cost, no provider lock-in |
+| Interfaces | MCP SDK 2.3 (stdio + streamable HTTP), FastAPI, argparse CLI | |
+| Web demo | Next.js (App Router, TypeScript, Tailwind) in `web/`: upload, outline, search, page image with the cited box highlighted | strongest demo for portfolio and posts |
+| Deploy | not in v0.1; later Docker on Fly.io + web on Vercel | prove quality first |
+| Order | engine + benchmark → MCP/REST/CLI → web demo → deploy | |
+
+API-backed providers use the standard library HTTP client, so they add no runtime dependencies. Keys
+are read from `OPENAI_API_KEY`, `VOYAGE_API_KEY` and `COHERE_API_KEY`.
+
+The web demo needs one extra REST route, `GET /v1/documents/{id}/pages/{n}.png?scale=`, which renders
+the page with pypdfium2, so the UI can draw cited bboxes over it.
+
 ## 6. Architecture
 
 ```
@@ -93,12 +114,13 @@ Decisions:
 - SQLite FTS5, tokenizer `unicode61 remove_diacritics 2`; user text is reduced to word tokens and
   OR-ed, so it never reaches FTS5 syntax.
 - Token estimate = `ceil(len(text) / 4)` everywhere, including when scoring `pdf-mcp`.
+- Parsing uses pypdfium2 (PDFium): ~20× faster than pdfminer-based parsers on 10-Ks (1.7 s vs ~30 s for 160 pages). Tables are detected from text alignment, not ruling lines, because SEC filings converted from HTML have no table borders.
 - Pages are 1-based in pdfctx. FinanceBench `evidence_page_num` is 0-based; the benchmark converts
   it once and a test pins the conversion against known evidence text.
 
 ## 7. Quality bar
 
-- Python ≥ 3.11. Runtime deps: `pdfplumber`, `pypdf`, `mcp>=2.3,<3`, `fastapi`, `uvicorn`. Extra
+- Python ≥ 3.11. Runtime deps: `pypdfium2`, `mcp>=2.3,<3`, `fastapi`, `uvicorn`. Extra
   `embed` = `fastembed`. Dev: `pytest`, `reportlab`, `ruff`, `httpx`.
 - Unit tests on reportlab-generated PDFs plus two MIT-licensed PDFs from pdfplumber's tests.
 - CI: ruff + pytest on 3.11/3.13 × Ubuntu/macOS; a manual workflow runs the full benchmark with
