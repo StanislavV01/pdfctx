@@ -22,12 +22,19 @@ from . import __version__
 from .errors import NotFound, PdfctxError
 from .library import Library
 from .mcp_server import build_server
+from .metrics import to_csv
 from .parse.pdf import PDFIUM_LOCK
 
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 MAX_UPLOAD_PAGES = 300
 MAX_RENDER_PIXELS = 40_000_000  # about a 6300 × 6300 bitmap
 LOCAL_HOSTS = ("127.0.0.1", "localhost", "::1")
+
+
+class MetricsRequest(BaseModel):
+    metrics: list[str]
+    years: list[int] | None = None
+    doc_ids: list[str] | None = None
 
 
 class ContextRequest(BaseModel):
@@ -164,6 +171,17 @@ def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.
     @app.get("/v1/audit")
     def audit(limit: int = 100) -> dict:
         return {"entries": lib.audit(limit)}
+
+    @app.post("/v1/metrics", response_model=None)
+    def metrics(body: MetricsRequest, format: str = "json") -> dict | Response:
+        out = lib.extract_metrics(body.metrics, body.years, body.doc_ids)
+        if format == "csv":
+            return Response(
+                to_csv(out),
+                media_type="text/csv",
+                headers={"Content-Disposition": 'attachment; filename="metrics.csv"'},
+            )
+        return out
 
     @app.post("/v1/context")
     def context(body: ContextRequest) -> dict:

@@ -154,3 +154,12 @@ def test_mcp_rejects_foreign_host(client):
         headers={"accept": "application/json, text/event-stream", "host": "evil.example"},
     )
     assert r.status_code == 421
+
+
+def test_metrics_route_json_and_csv(client):
+    body = {"metrics": ["Total"], "years": [2025]}
+    out = client.post("/v1/metrics", json=body).json()
+    assert out["values"][0]["value"] == 2000.0
+    r = client.post("/v1/metrics", params={"format": "csv"}, json=body)
+    assert r.headers["content-type"].startswith("text/csv")
+    assert r.text.splitlines()[1].split(",")[1:4] == ["Total", "2025", "2000.0"]

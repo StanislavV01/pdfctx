@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from . import context as ctx
+from . import metrics as metrics_mod
 from .embed import Embedder, Reranker
 from .errors import PdfctxError
 from .indexer import IndexOptions, IndexReport, expand, index_paths
@@ -229,6 +230,23 @@ class Library:
             "format": format,
             "table": table,
         }
+
+    def extract_metrics(
+        self, metrics: list[str], years: list[int] | None = None, doc_ids: list[str] | None = None
+    ) -> dict:
+        self.refresh()
+        if not isinstance(metrics, list) or not 1 <= len(metrics) <= 30:
+            raise PdfctxError("metrics must be a list of 1 to 30 names")
+        if years is not None and (not isinstance(years, list) or len(years) > 20):
+            raise PdfctxError("years must be a list of at most 20 years")
+        out = metrics_mod.extract(self.store, metrics, years, doc_ids)
+        self._audit(
+            "extract_metrics",
+            {"metrics": metrics, "years": years, "doc_ids": doc_ids},
+            [v["block_id"] for v in out["values"]],
+            [v["doc_id"] for v in out["values"]],
+        )
+        return out
 
     def cite(self, block_id: str) -> dict:
         self.refresh()

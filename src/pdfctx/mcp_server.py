@@ -42,7 +42,16 @@ def _errors_as_tool_errors(fn: Callable[..., Any]) -> Callable[..., Any]:
     return wrapper
 
 
-TOOLS = ["list_documents", "outline", "read_section", "search", "get_table", "cite", "context_pack"]
+TOOLS = [
+    "list_documents",
+    "outline",
+    "read_section",
+    "search",
+    "get_table",
+    "extract_metrics",
+    "cite",
+    "context_pack",
+]
 
 
 def build_server(lib: Library) -> MCPServer:
@@ -87,6 +96,18 @@ def build_server(lib: Library) -> MCPServer:
         """A full table by its block id, as markdown or csv, with its caption and the sentence before it.
         Use this before quoting numbers."""
         return lib.get_table(table_id, format)
+
+    @tool
+    @_errors_as_tool_errors
+    def extract_metrics(
+        metrics: list[str], years: list[int] | None = None, doc_ids: list[str] | None = None
+    ) -> dict[str, Any]:
+        """Financial metrics read from the filings' tables: one value per document, metric and year, each
+        with its page, bbox, row label and the cell as printed. Known names: revenue, gross_profit,
+        operating_income, net_income, eps_diluted, rnd, sga, depreciation_amortization, operating_cash_flow,
+        capex, free_cash_flow, cash, total_assets, total_liabilities, long_term_debt, dividends_paid. Any
+        other string is matched as a row label. Values not found are listed under `missing`, not estimated."""
+        return lib.extract_metrics(metrics, years, doc_ids)
 
     @tool
     @_errors_as_tool_errors

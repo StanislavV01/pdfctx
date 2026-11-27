@@ -21,6 +21,12 @@ jobs:
       - name: tesseract for the OCR tests (skipped where it is missing)
         if: runner.os == 'Linux'
         run: sudo apt-get install -y -qq tesseract-ocr > /dev/null
+      - name: 3M 2018 10-K for the golden metrics test (skipped where it is missing)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p ~/.cache/pdfctx-bench/pdfs
+          curl -sSfL -o ~/.cache/pdfctx-bench/pdfs/3M_2018_10K.pdf \
+            https://raw.githubusercontent.com/patronus-ai/financebench/cc39aeb4afdf33909ee1412188bf89035950c2eb/pdfs/3M_2018_10K.pdf
       - run: pip install -e ".[dev]"
       - run: ruff check .
       - run: ruff format --check .

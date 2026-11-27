@@ -312,6 +312,10 @@ class Store:
             for r in self.db.execute("SELECT * FROM blocks WHERE doc_id=? ORDER BY idx", (doc_id,))
         ]
 
+    def tables_for(self, doc_id: str) -> list[BlockRow]:
+        rows = self.db.execute("SELECT * FROM blocks WHERE doc_id=? AND kind='table' ORDER BY idx", (doc_id,))
+        return [self._block(r) for r in rows]
+
     def blocks_in_sections(self, section_ids: Iterable[str]) -> list[BlockRow]:
         ids = list(section_ids)
         if not ids:
