@@ -25,7 +25,13 @@ await page.screenshot({ path: `${OUT}/2-viewer.png` });
 
 await page.getByPlaceholder(/Ask the document/).fill(QUERY);
 await page.getByRole("button", { name: "Search", exact: true }).click();
-await page.getByText("context_pack").waitFor({ timeout: 30000 });
+try {
+  await page.getByText("context_pack").waitFor({ timeout: 30000 });
+} catch (e) {
+  await page.screenshot({ path: `${OUT}/3-search-failed.png` });
+  console.log("search did not finish; page text:\n" + (await page.locator("aside").last().innerText()));
+  throw e;
+}
 await page.waitForLoadState("networkidle");
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${OUT}/3-search.png` });

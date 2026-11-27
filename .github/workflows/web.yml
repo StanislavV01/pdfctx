@@ -62,8 +62,11 @@ jobs:
       - name: Screenshots
         working-directory: web
         run: node scripts/screens.mjs
+      - name: Server logs
+        if: always()
+        run: tail -n 60 api.log ui.log
       - name: Publish screenshots to the web-screens branch
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request'
         run: |
           cp -r web/screens /tmp/screens && cd /tmp/screens
           git init -q -b web-screens && git add -A
