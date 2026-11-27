@@ -30,7 +30,8 @@ export default function Documents() {
     setUploading(true);
     setError(null);
     try {
-      await api.upload(file);
+      const doc = await api.upload(file);
+      if (doc.status !== "ok") setError(`${file.name}: indexed with status "${doc.status}" (no searchable text)`);
       load();
     } catch (e) {
       setError((e as Error).message);

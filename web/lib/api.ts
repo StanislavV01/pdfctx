@@ -83,7 +83,7 @@ export const api = {
   upload: (file: File) =>
     call<{ id: string; title: string; pages: number; status: string }>("/v1/documents", {
       method: "POST",
-      headers: { "content-type": "application/pdf", "x-filename": file.name },
+      headers: { "content-type": "application/pdf", "x-filename": encodeURIComponent(file.name) },
       body: file,
     }),
   pageUrl: (id: string, page: number, scale: number) =>
