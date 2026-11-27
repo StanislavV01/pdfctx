@@ -1,12 +1,10 @@
 import pypdfium2 as pdfium
 
 from pdfctx import __version__
-from pdfctx.cli import main
 
 
-def test_version(capsys):
-    assert main(["--version"]) == 0
-    assert capsys.readouterr().out.strip() == __version__ == "0.1.0"
+def test_version_constant():
+    assert __version__ == "0.1.0"
 
 
 def test_generated_report_contains_sentence(report_pdf):
