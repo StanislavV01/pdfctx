@@ -6,6 +6,7 @@ on:
     paths: ["web/**", ".github/workflows/web.yml"]
   pull_request:
     paths: ["web/**"]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,3 +22,49 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
       - run: npm run build
+
+  screens:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_PDFCTX_API: http://127.0.0.1:8000
+      PDFCTX_WEB_ORIGIN: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: pip install -e .
+      - name: Demo document (a real 10-K from FinanceBench)
+        run: |
+          mkdir -p demo
+          curl -sSfL -o demo/3M_2018_10K.pdf \
+            https://raw.githubusercontent.com/patronus-ai/financebench/cc39aeb4afdf33909ee1412188bf89035950c2eb/pdfs/3M_2018_10K.pdf
+      - name: Start the API
+        run: |
+          pdfctx index demo
+          nohup pdfctx serve-http demo --uploads uploads > api.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf localhost:8000/healthz && break; sleep 2; done
+      - name: Build and start the UI
+        working-directory: web
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+          npm run build
+          nohup npm start > ../ui.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf localhost:3000 > /dev/null && break; sleep 2; done
+      - name: Screenshots
+        working-directory: web
+        run: node scripts/screens.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-screens
+          path: |
+            web/screens/
+            api.log
+            ui.log
