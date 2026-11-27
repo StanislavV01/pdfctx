@@ -100,7 +100,7 @@ def cmd_serve_http(args) -> int:
     from .api import create_app
 
     lib = _library(args, "http")
-    app = create_app(lib, upload_dir=Path(args.uploads) if args.uploads else None)
+    app = create_app(lib, upload_dir=Path(args.uploads) if args.uploads else None, host=args.host)
     print(
         f"pdfctx {__version__}: REST http://{args.host}:{args.port}/v1 · MCP http://{args.host}:{args.port}/mcp",
         file=sys.stderr,

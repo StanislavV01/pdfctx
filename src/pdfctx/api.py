@@ -12,6 +12,7 @@ import pypdfium2 as pdfium
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
+from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import BaseModel, Field
 
 from . import __version__
@@ -33,9 +34,25 @@ def _status(e: PdfctxError) -> int:
     return 404 if str(e).startswith("unknown ") else 400
 
 
-def create_app(lib: Library, upload_dir: Path | None = None) -> FastAPI:
+def _transport_security(host: str) -> TransportSecuritySettings | None:
+    """DNS-rebinding protection for /mcp. Local hosts are allowed by default; for a public deployment list the
+    public host names in PDFCTX_ALLOWED_HOSTS (comma-separated, e.g. "pdfctx.example.com,pdfctx.fly.dev")."""
+    extra = [h.strip() for h in os.environ.get("PDFCTX_ALLOWED_HOSTS", "").split(",") if h.strip()]
+    local = ["127.0.0.1:*", "localhost:*", "[::1]:*"]
+    if not extra and host not in ("127.0.0.1", "localhost", "::1"):
+        return None  # SDK default for non-local binds; set PDFCTX_ALLOWED_HOSTS to lock it down
+    hosts = local + [h if ":" in h else f"{h}:*" for h in extra] + extra
+    origins = [f"http://{h}" for h in local] + [f"https://{h}" for h in extra]
+    return TransportSecuritySettings(
+        enable_dns_rebinding_protection=True, allowed_hosts=hosts, allowed_origins=origins
+    )
+
+
+def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.0.1") -> FastAPI:
     mcp = build_server(lib)
-    mcp_app = mcp.streamable_http_app(streamable_http_path="/mcp")
+    mcp_app = mcp.streamable_http_app(
+        streamable_http_path="/mcp", host=host, transport_security=_transport_security(host)
+    )
 
     @contextlib.asynccontextmanager
     async def lifespan(_app: FastAPI):

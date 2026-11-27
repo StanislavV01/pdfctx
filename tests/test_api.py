@@ -15,7 +15,7 @@ from tests import pdfgen
 @pytest.fixture
 def client(tmp_path, report_pdf):
     lib = Library(tmp_path / "i.db", roots=[report_pdf])
-    with TestClient(create_app(lib, upload_dir=tmp_path / "uploads")) as c:
+    with TestClient(create_app(lib, upload_dir=tmp_path / "uploads"), base_url="http://127.0.0.1:8000") as c:
         yield c
     lib.close()
 
@@ -79,3 +79,12 @@ def test_mcp_mounted(client):
         headers={"accept": "application/json, text/event-stream"},
     )
     assert r.status_code == 200 and "pdfctx" in r.text
+
+
+def test_mcp_rejects_foreign_host(client):
+    r = client.post(
+        "/mcp",
+        json={"jsonrpc": "2.0", "id": 1, "method": "ping"},
+        headers={"accept": "application/json, text/event-stream", "host": "evil.example"},
+    )
+    assert r.status_code == 421
