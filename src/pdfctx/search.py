@@ -101,7 +101,8 @@ class SearchConfig:
     bm25: bool = True
     vectors: bool = False
     rerank: bool = False
-    # Defaults tuned on FinanceBench (doc scope) and rounded; see bench/results/CHANGELOG.md.
+    # Defaults tuned on the same FinanceBench questions that are reported (no held-out split);
+    # see bench/results/CHANGELOG.md.
     k_candidates: int = 200
     rerank_top: int = 30
     context_weight: float = 1.0

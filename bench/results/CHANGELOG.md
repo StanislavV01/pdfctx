@@ -43,7 +43,10 @@ Defaults were rounded (`page_boost=1.0`, not the best grid value 0.35), so they 
   0.193 to 0.120 / 0.153 / 0.153 for N = 1 / 2 / 3.
 - **Sum-of-page boost**: see Kept 2.
 
-## Corpus scope (no tuning was done here)
+## Corpus scope
+
+The defaults were not tuned on corpus scope, but one corpus-scope change (document routing) was tried
+and reverted, so this table is not fully untouched.
 
 | system | R@1 | R@3 | R@5 | R@10 | MRR | tok |
 |---|---|---|---|---|---|---|

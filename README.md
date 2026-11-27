@@ -2,7 +2,7 @@
 
 # 📑 pdfctx
 
-**PDF retrieval for AI agents that finds the right page more often and costs 10× fewer tokens.**
+**PDF retrieval for AI agents: finds the right page at least as often as page-level RAG, for 10× fewer tokens.**
 
 pdfctx turns PDFs into a section tree of paragraphs and tables with page + bounding box on every block, and
 gives agents (Claude, Cursor, any MCP client) tools to navigate, search, cite and pack context. It reads
@@ -25,17 +25,24 @@ borderless SEC-style tables row by row, and it logs every read.
 retrieves 10 passages from the question's filing, and we measure whether an evidence page is among them. No LLM
 is involved and nothing is graded by a model.
 
-| system | R@1 | R@3 | R@5 | R@10 | MRR@10 | tokens for top-5 |
+| system (single-document scope) | R@1 | R@3 | R@5 | R@10 | MRR@10 | tokens for top-5 |
 |---|---|---|---|---|---|---|
 | page-level BM25 (what most "chat with PDF" tools do) | 0.147 | 0.233 | 0.360 | 0.507 | 0.230 | 4,615 |
 | pdfctx: structure | 0.160 | 0.267 | 0.333 | 0.453 | 0.237 | 586 |
 | pdfctx: + section context | 0.160 | 0.267 | 0.353 | 0.500 | 0.242 | 572 |
 | **pdfctx: + table rows (default)** | **0.167** | **0.313** | **0.393** | **0.567** | **0.270** | **461** |
 
-**pdfctx is ahead of the page baseline on every metric while handing the agent 10× fewer tokens.** Every
-change was kept or reverted based on these numbers. The log in
-[`bench/results/CHANGELOG.md`](bench/results/CHANGELOG.md) includes what did not work: summed page boosts lost
-to boilerplate, and document routing hurt corpus search. Defaults are rounded, not fitted to the 150 questions.
+**pdfctx is ahead of the page baseline on every metric while handing the agent 10× fewer tokens.** With
+150 questions, most of that recall gap is within noise. A paired bootstrap (`python3 -m bench.compare doc
+pdfctx-tables`) gives R@3 +0.080 with 95% CI [+0.013, +0.147], the only cutoff where the CI excludes zero.
+R@10 is +0.060 with CI [−0.013, +0.133]. The firm result is the token cost at equal or better recall. Tokens
+count passage text only (len/4), not the JSON fields and section paths the tool adds around it.
+
+Every change was kept or reverted based on these numbers, **on the same 150 questions reported here**. There
+is no held-out split, so the defaults (candidate pool, context weight, per-page cap, max- vs sum-boost) are
+tuned to this set and the numbers are optimistic. The log in
+[`bench/results/CHANGELOG.md`](bench/results/CHANGELOG.md) lists every choice, including what did not work:
+summed page boosts lost to boilerplate, and document routing hurt corpus search.
 
 Structure alone does not beat the baseline at R@5–10; the gain comes from table rows.
 
@@ -46,9 +53,9 @@ which run locally through `pdfctx[embed]`, plus [`jztan/pdf-mcp`](https://github
 the same way. They run in the [Benchmark workflow](.github/workflows/bench.yml) and will be added here from
 its artifact.
 
-Corpus scope (search all 84 filings): R@10 0.200 vs 0.187 for the baseline at 12× fewer tokens, but rank-1 is
+Corpus scope (search all 84 filings, no CI-significant difference): R@10 0.200 vs 0.187 for the baseline at 12× fewer tokens, but rank-1 is
 lower (0.073 vs 0.093). Finding the right filing among 84 similar ones is the open problem
-([details](bench/results/CHANGELOG.md#corpus-scope-no-tuning-was-done-here)).
+([details](bench/results/CHANGELOG.md#corpus-scope)).
 
 ## Why it works
 
@@ -126,7 +133,11 @@ curl -X POST localhost:8000/v1/context -H 'content-type: application/json' \
 # MCP clients connect to http://localhost:8000/mcp
 ```
 
-Uploads (`POST /v1/documents`, raw PDF body) are off unless `--uploads` is set, and are limited to 20 MB and
+Every route checks the `Host` and `Origin` headers, which blocks DNS-rebinding and cross-site requests. By
+default only localhost is allowed. Binding to another address (`--host 0.0.0.0`) refuses to start until
+`PDFCTX_ALLOWED_HOSTS` lists the public host names. Set `PDFCTX_WEB_ORIGIN` to allow a separate web UI.
+
+Uploads (`POST /v1/documents`, raw PDF body with `content-type: application/pdf`) are off unless `--uploads` is set, and are limited to 20 MB and
 300 pages. `GET /v1/documents/{id}/pages/{n}.png` renders a page so a UI can draw cited boxes on it.
 
 **Better recall with local models** (first run downloads ~200 MB of ONNX models):
