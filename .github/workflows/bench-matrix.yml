@@ -1,0 +1,47 @@
+name: Benchmark (parallel)
+
+# One job per system, in parallel; each publishes its results to the branch bench/<scope>/<system>
+# as soon as it finishes, so a slow system cannot hold back (or time out) the others.
+on:
+  workflow_dispatch:
+    inputs:
+      systems:
+        description: JSON list of systems
+        default: '["baseline","pdfctx-tables","pdfctx-hybrid","pdfctx-rerank","pdf-mcp"]'
+      scope:
+        description: doc or corpus
+        default: doc
+
+jobs:
+  run:
+    strategy:
+      fail-fast: false
+      matrix:
+        system: ${{ fromJSON(inputs.systems) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pdfctx-bench
+          key: financebench-cc39aeb-${{ matrix.system }}-${{ hashFiles('src/**/*.py') }}
+          restore-keys: |
+            financebench-cc39aeb-${{ matrix.system }}-
+            financebench-cc39aeb-
+      - run: pip install -e ".[embed,dev]" pdf-mcp
+      - run: python -m bench.financebench --systems "${{ matrix.system }}" --scope "${{ inputs.scope }}" | tee bench-table.md
+      - name: Publish to bench/${{ inputs.scope }}/${{ matrix.system }}
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp -r bench/results bench-table.md /tmp/out/ 2>/dev/null || true
+          cd /tmp/out && git init -q -b out && git add -A
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com \
+            commit -qm "bench ${{ inputs.scope }} ${{ matrix.system }} @ ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" \
+            "out:bench/${{ inputs.scope }}/${{ matrix.system }}"
