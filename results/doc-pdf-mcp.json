@@ -1,0 +1,2306 @@
+{
+ "system": "pdf-mcp",
+ "scope": "doc",
+ "questions": 150,
+ "metrics": {
+  "page_recall@1": 0.2467,
+  "page_recall@3": 0.4267,
+  "page_recall@5": 0.5533,
+  "page_recall@10": 0.6933,
+  "mrr@10": 0.3679,
+  "tokens@5": 940.4533,
+  "latency_p50_ms": 20305.6994
+ },
+ "prepare_s": 1.2,
+ "version": "3.8.0",
+ "financebench_commit": "cc39aeb4afdf33909ee1412188bf89035950c2eb",
+ "date": "2026-11-27",
+ "per_question": [
+  {
+   "id": "financebench_id_03029",
+   "kind": "metrics-generated",
+   "rank": 8,
+   "evidence": [
+    60
+   ],
+   "top_pages": [
+    43,
+    39,
+    26,
+    49,
+    109
+   ]
+  },
+  {
+   "id": "financebench_id_04672",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    58
+   ],
+   "top_pages": [
+    44,
+    99,
+    47,
+    48,
+    62
+   ]
+  },
+  {
+   "id": "financebench_id_00499",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    48,
+    50,
+    52
+   ],
+   "top_pages": [
+    121,
+    92,
+    61,
+    36,
+    62
+   ]
+  },
+  {
+   "id": "financebench_id_01226",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    27
+   ],
+   "top_pages": [
+    31,
+    20,
+    30,
+    21,
+    53
+   ]
+  },
+  {
+   "id": "financebench_id_01865",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    25
+   ],
+   "top_pages": [
+    19,
+    20,
+    11,
+    27,
+    33
+   ]
+  },
+  {
+   "id": "financebench_id_00807",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    5
+   ],
+   "top_pages": [
+    70,
+    54,
+    83,
+    19,
+    21
+   ]
+  },
+  {
+   "id": "financebench_id_00941",
+   "kind": "domain-relevant",
+   "rank": 4,
+   "evidence": [
+    1
+   ],
+   "top_pages": [
+    71,
+    70,
+    85,
+    1,
+    73
+   ]
+  },
+  {
+   "id": "financebench_id_01858",
+   "kind": "novel-generated",
+   "rank": 4,
+   "evidence": [
+    62
+   ],
+   "top_pages": [
+    70,
+    73,
+    19,
+    62,
+    14
+   ]
+  },
+  {
+   "id": "financebench_id_02987",
+   "kind": "metrics-generated",
+   "rank": 6,
+   "evidence": [
+    69,
+    70
+   ],
+   "top_pages": [
+    175,
+    174,
+    109,
+    173,
+    119
+   ]
+  },
+  {
+   "id": "financebench_id_07966",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    70,
+    73
+   ],
+   "top_pages": [
+    73,
+    173,
+    95,
+    87,
+    174
+   ]
+  },
+  {
+   "id": "financebench_id_04735",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    59,
+    63
+   ],
+   "top_pages": [
+    63,
+    78,
+    3,
+    77,
+    69
+   ]
+  },
+  {
+   "id": "financebench_id_07507",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    62
+   ],
+   "top_pages": [
+    3,
+    52,
+    69,
+    92,
+    40
+   ]
+  },
+  {
+   "id": "financebench_id_03856",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    57,
+    61
+   ],
+   "top_pages": [
+    61,
+    49,
+    76,
+    68,
+    74
+   ]
+  },
+  {
+   "id": "financebench_id_00438",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    54
+   ],
+   "top_pages": [
+    61,
+    64,
+    62,
+    4,
+    7
+   ]
+  },
+  {
+   "id": "financebench_id_00591",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    57
+   ],
+   "top_pages": [
+    6,
+    73,
+    9,
+    10,
+    5
+   ]
+  },
+  {
+   "id": "financebench_id_01319",
+   "kind": "domain-relevant",
+   "rank": 10,
+   "evidence": [
+    132
+   ],
+   "top_pages": [
+    86,
+    199,
+    76,
+    166,
+    84
+   ]
+  },
+  {
+   "id": "financebench_id_00540",
+   "kind": "domain-relevant",
+   "rank": 5,
+   "evidence": [
+    130,
+    132
+   ],
+   "top_pages": [
+    2,
+    149,
+    140,
+    199,
+    130
+   ]
+  },
+  {
+   "id": "financebench_id_10420",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    130,
+    132
+   ],
+   "top_pages": [
+    142,
+    84,
+    181,
+    111,
+    218
+   ]
+  },
+  {
+   "id": "financebench_id_06655",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    38,
+    40
+   ],
+   "top_pages": [
+    40,
+    42,
+    48,
+    43,
+    72
+   ]
+  },
+  {
+   "id": "financebench_id_08135",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    38
+   ],
+   "top_pages": [
+    43,
+    25,
+    72,
+    20,
+    19
+   ]
+  },
+  {
+   "id": "financebench_id_08286",
+   "kind": "metrics-generated",
+   "rank": 8,
+   "evidence": [
+    38
+   ],
+   "top_pages": [
+    72,
+    35,
+    2,
+    80,
+    3
+   ]
+  },
+  {
+   "id": "financebench_id_03882",
+   "kind": "metrics-generated",
+   "rank": 10,
+   "evidence": [
+    50
+   ],
+   "top_pages": [
+    34,
+    58,
+    59,
+    42,
+    141
+   ]
+  },
+  {
+   "id": "financebench_id_01935",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    2,
+    1,
+    3,
+    7,
+    4
+   ]
+  },
+  {
+   "id": "financebench_id_00799",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    52
+   ],
+   "top_pages": [
+    122,
+    21,
+    118,
+    4,
+    124
+   ]
+  },
+  {
+   "id": "financebench_id_01079",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    64
+   ],
+   "top_pages": [
+    109,
+    55,
+    30,
+    144,
+    145
+   ]
+  },
+  {
+   "id": "financebench_id_01148",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    5
+   ],
+   "top_pages": [
+    5,
+    9,
+    4,
+    30,
+    7
+   ]
+  },
+  {
+   "id": "financebench_id_00684",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    50
+   ],
+   "top_pages": [
+    50,
+    38,
+    122,
+    32,
+    29
+   ]
+  },
+  {
+   "id": "financebench_id_01936",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    15
+   ],
+   "top_pages": [
+    15,
+    32,
+    4,
+    7,
+    31
+   ]
+  },
+  {
+   "id": "financebench_id_01928",
+   "kind": "novel-generated",
+   "rank": 9,
+   "evidence": [
+    12
+   ],
+   "top_pages": [
+    2,
+    7,
+    5,
+    3,
+    1
+   ]
+  },
+  {
+   "id": "financebench_id_01930",
+   "kind": "novel-generated",
+   "rank": 8,
+   "evidence": [
+    10
+   ],
+   "top_pages": [
+    7,
+    1,
+    3,
+    5,
+    2
+   ]
+  },
+  {
+   "id": "financebench_id_03069",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    56,
+    60
+   ],
+   "top_pages": [
+    3,
+    39,
+    60,
+    63,
+    61
+   ]
+  },
+  {
+   "id": "financebench_id_00222",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    56
+   ],
+   "top_pages": [
+    53,
+    22,
+    9,
+    46,
+    107
+   ]
+  },
+  {
+   "id": "financebench_id_00995",
+   "kind": "domain-relevant",
+   "rank": 4,
+   "evidence": [
+    4
+   ],
+   "top_pages": [
+    11,
+    60,
+    7,
+    4,
+    10
+   ]
+  },
+  {
+   "id": "financebench_id_01198",
+   "kind": "domain-relevant",
+   "rank": 2,
+   "evidence": [
+    43
+   ],
+   "top_pages": [
+    4,
+    43,
+    60,
+    106,
+    44
+   ]
+  },
+  {
+   "id": "financebench_id_00917",
+   "kind": "domain-relevant",
+   "rank": 3,
+   "evidence": [
+    43
+   ],
+   "top_pages": [
+    28,
+    19,
+    43,
+    22,
+    49
+   ]
+  },
+  {
+   "id": "financebench_id_01279",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    58
+   ],
+   "top_pages": [
+    58,
+    59,
+    4,
+    106,
+    51
+   ]
+  },
+  {
+   "id": "financebench_id_00563",
+   "kind": "novel-generated",
+   "rank": 6,
+   "evidence": [
+    48
+   ],
+   "top_pages": [
+    43,
+    60,
+    6,
+    4,
+    13
+   ]
+  },
+  {
+   "id": "financebench_id_00757",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    12
+   ],
+   "top_pages": [
+    4,
+    106,
+    11,
+    9,
+    80
+   ]
+  },
+  {
+   "id": "financebench_id_00476",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    1
+   ],
+   "top_pages": [
+    1,
+    259,
+    162,
+    260,
+    252
+   ]
+  },
+  {
+   "id": "financebench_id_01028",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    155
+   ],
+   "top_pages": [
+    9,
+    153,
+    157,
+    4,
+    5
+   ]
+  },
+  {
+   "id": "financebench_id_00723",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    96
+   ],
+   "top_pages": [
+    225,
+    64,
+    224,
+    152,
+    45
+   ]
+  },
+  {
+   "id": "financebench_id_00720",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    96
+   ],
+   "top_pages": [
+    4,
+    3,
+    152,
+    102,
+    135
+   ]
+  },
+  {
+   "id": "financebench_id_01351",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    44
+   ],
+   "top_pages": [
+    126,
+    148,
+    164,
+    150,
+    99
+   ]
+  },
+  {
+   "id": "financebench_id_01964",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    98
+   ],
+   "top_pages": [
+    152,
+    139,
+    65,
+    99,
+    150
+   ]
+  },
+  {
+   "id": "financebench_id_01981",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    45
+   ],
+   "top_pages": [
+    28,
+    29,
+    5,
+    4,
+    188
+   ]
+  },
+  {
+   "id": "financebench_id_05718",
+   "kind": "metrics-generated",
+   "rank": 5,
+   "evidence": [
+    86
+   ],
+   "top_pages": [
+    66,
+    106,
+    68,
+    67,
+    86
+   ]
+  },
+  {
+   "id": "financebench_id_04254",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    86,
+    88
+   ],
+   "top_pages": [
+    88,
+    69,
+    86,
+    87,
+    90
+   ]
+  },
+  {
+   "id": "financebench_id_00070",
+   "kind": "domain-relevant",
+   "rank": 4,
+   "evidence": [
+    81,
+    82
+   ],
+   "top_pages": [
+    87,
+    145,
+    1,
+    82,
+    140
+   ]
+  },
+  {
+   "id": "financebench_id_02608",
+   "kind": "metrics-generated",
+   "rank": 4,
+   "evidence": [
+    56
+   ],
+   "top_pages": [
+    81,
+    34,
+    91,
+    56,
+    36
+   ]
+  },
+  {
+   "id": "financebench_id_04417",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    52
+   ],
+   "top_pages": [
+    52,
+    60,
+    45,
+    29,
+    80
+   ]
+  },
+  {
+   "id": "financebench_id_00685",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    40
+   ],
+   "top_pages": [
+    26,
+    32,
+    23,
+    27,
+    49
+   ]
+  },
+  {
+   "id": "financebench_id_01077",
+   "kind": "domain-relevant",
+   "rank": 5,
+   "evidence": [
+    51
+   ],
+   "top_pages": [
+    24,
+    23,
+    44,
+    5,
+    51
+   ]
+  },
+  {
+   "id": "financebench_id_01275",
+   "kind": "domain-relevant",
+   "rank": 4,
+   "evidence": [
+    42
+   ],
+   "top_pages": [
+    30,
+    29,
+    23,
+    42,
+    6
+   ]
+  },
+  {
+   "id": "financebench_id_00288",
+   "kind": "novel-generated",
+   "rank": 3,
+   "evidence": [
+    20
+   ],
+   "top_pages": [
+    21,
+    8,
+    20,
+    22,
+    16
+   ]
+  },
+  {
+   "id": "financebench_id_00460",
+   "kind": "novel-generated",
+   "rank": 4,
+   "evidence": [
+    17
+   ],
+   "top_pages": [
+    14,
+    19,
+    25,
+    17,
+    15
+   ]
+  },
+  {
+   "id": "financebench_id_01902",
+   "kind": "novel-generated",
+   "rank": 4,
+   "evidence": [
+    18
+   ],
+   "top_pages": [
+    17,
+    19,
+    15,
+    18,
+    14
+   ]
+  },
+  {
+   "id": "financebench_id_04660",
+   "kind": "metrics-generated",
+   "rank": 2,
+   "evidence": [
+    68
+   ],
+   "top_pages": [
+    61,
+    68,
+    83,
+    76,
+    7
+   ]
+  },
+  {
+   "id": "financebench_id_03838",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    86
+   ],
+   "top_pages": [
+    17,
+    22,
+    57,
+    59,
+    139
+   ]
+  },
+  {
+   "id": "financebench_id_07661",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    90
+   ],
+   "top_pages": [
+    74,
+    11,
+    75,
+    14,
+    5
+   ]
+  },
+  {
+   "id": "financebench_id_10285",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    52
+   ],
+   "top_pages": [
+    53,
+    110,
+    52,
+    85,
+    64
+   ]
+  },
+  {
+   "id": "financebench_id_00517",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    62
+   ],
+   "top_pages": [
+    37,
+    83,
+    38,
+    55,
+    41
+   ]
+  },
+  {
+   "id": "financebench_id_01091",
+   "kind": "domain-relevant",
+   "rank": 3,
+   "evidence": [
+    113
+   ],
+   "top_pages": [
+    29,
+    4,
+    113,
+    16,
+    6
+   ]
+  },
+  {
+   "id": "financebench_id_00678",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    55
+   ],
+   "top_pages": [
+    51,
+    35,
+    41,
+    23,
+    120
+   ]
+  },
+  {
+   "id": "financebench_id_01290",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    8,
+    10,
+    14
+   ],
+   "top_pages": [
+    5,
+    118,
+    29,
+    43,
+    30
+   ]
+  },
+  {
+   "id": "financebench_id_00464",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    8
+   ],
+   "top_pages": [
+    8,
+    16,
+    9,
+    29,
+    12
+   ]
+  },
+  {
+   "id": "financebench_id_00494",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    9
+   ],
+   "top_pages": [
+    9,
+    35,
+    23,
+    43,
+    122
+   ]
+  },
+  {
+   "id": "financebench_id_00585",
+   "kind": "novel-generated",
+   "rank": 10,
+   "evidence": [
+    55
+   ],
+   "top_pages": [
+    27,
+    43,
+    24,
+    37,
+    79
+   ]
+  },
+  {
+   "id": "financebench_id_03473",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    74,
+    76
+   ],
+   "top_pages": [
+    74,
+    82,
+    147,
+    76,
+    169
+   ]
+  },
+  {
+   "id": "financebench_id_09724",
+   "kind": "metrics-generated",
+   "rank": 10,
+   "evidence": [
+    62
+   ],
+   "top_pages": [
+    47,
+    49,
+    68,
+    67,
+    34
+   ]
+  },
+  {
+   "id": "financebench_id_06272",
+   "kind": "metrics-generated",
+   "rank": 2,
+   "evidence": [
+    63,
+    66
+   ],
+   "top_pages": [
+    67,
+    66,
+    34,
+    56,
+    94
+   ]
+  },
+  {
+   "id": "financebench_id_10130",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    70,
+    72
+   ],
+   "top_pages": [
+    72,
+    73,
+    43,
+    84,
+    31
+   ]
+  },
+  {
+   "id": "financebench_id_02981",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    65
+   ],
+   "top_pages": [
+    26,
+    32,
+    28,
+    102,
+    110
+   ]
+  },
+  {
+   "id": "financebench_id_01346",
+   "kind": "domain-relevant",
+   "rank": 5,
+   "evidence": [
+    24
+   ],
+   "top_pages": [
+    77,
+    79,
+    26,
+    8,
+    24
+   ]
+  },
+  {
+   "id": "financebench_id_00005",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    60
+   ],
+   "top_pages": [
+    2,
+    34,
+    66,
+    37,
+    8
+   ]
+  },
+  {
+   "id": "financebench_id_04209",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    38
+   ],
+   "top_pages": [
+    38,
+    51,
+    29,
+    19,
+    60
+   ]
+  },
+  {
+   "id": "financebench_id_05915",
+   "kind": "metrics-generated",
+   "rank": 9,
+   "evidence": [
+    302,
+    304
+   ],
+   "top_pages": [
+    363,
+    145,
+    330,
+    324,
+    295
+   ]
+  },
+  {
+   "id": "financebench_id_00790",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    108,
+    110
+   ],
+   "top_pages": [
+    191,
+    18,
+    4,
+    25,
+    114
+   ]
+  },
+  {
+   "id": "financebench_id_01107",
+   "kind": "domain-relevant",
+   "rank": 4,
+   "evidence": [
+    173,
+    174
+   ],
+   "top_pages": [
+    175,
+    177,
+    3,
+    173,
+    20
+   ]
+  },
+  {
+   "id": "financebench_id_01244",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    68
+   ],
+   "top_pages": [
+    68,
+    70,
+    113,
+    168,
+    92
+   ]
+  },
+  {
+   "id": "financebench_id_00839",
+   "kind": "novel-generated",
+   "rank": 5,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    29,
+    30,
+    5,
+    8,
+    2
+   ]
+  },
+  {
+   "id": "financebench_id_00822",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    2,
+    3,
+    1,
+    4
+   ]
+  },
+  {
+   "id": "financebench_id_04103",
+   "kind": "metrics-generated",
+   "rank": 4,
+   "evidence": [
+    53,
+    55
+   ],
+   "top_pages": [
+    107,
+    109,
+    120,
+    55,
+    103
+   ]
+  },
+  {
+   "id": "financebench_id_03471",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    50
+   ],
+   "top_pages": [
+    96,
+    27,
+    50,
+    17,
+    95
+   ]
+  },
+  {
+   "id": "financebench_id_04854",
+   "kind": "metrics-generated",
+   "rank": 2,
+   "evidence": [
+    52
+   ],
+   "top_pages": [
+    46,
+    52,
+    37,
+    95,
+    53
+   ]
+  },
+  {
+   "id": "financebench_id_10136",
+   "kind": "metrics-generated",
+   "rank": 4,
+   "evidence": [
+    45,
+    49
+   ],
+   "top_pages": [
+    48,
+    73,
+    71,
+    49,
+    92
+   ]
+  },
+  {
+   "id": "financebench_id_00956",
+   "kind": "domain-relevant",
+   "rank": 7,
+   "evidence": [
+    28
+   ],
+   "top_pages": [
+    1,
+    4,
+    12,
+    58,
+    108
+   ]
+  },
+  {
+   "id": "financebench_id_00669",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    34
+   ],
+   "top_pages": [
+    39,
+    13,
+    64,
+    1,
+    40
+   ]
+  },
+  {
+   "id": "financebench_id_00711",
+   "kind": "domain-relevant",
+   "rank": 7,
+   "evidence": [
+    46,
+    47
+   ],
+   "top_pages": [
+    53,
+    78,
+    50,
+    40,
+    58
+   ]
+  },
+  {
+   "id": "financebench_id_00651",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    1
+   ],
+   "top_pages": [
+    1,
+    5,
+    6,
+    12,
+    2
+   ]
+  },
+  {
+   "id": "financebench_id_01484",
+   "kind": "novel-generated",
+   "rank": 7,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    1,
+    14,
+    6,
+    13,
+    8
+   ]
+  },
+  {
+   "id": "financebench_id_01488",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    4
+   ],
+   "top_pages": [
+    4,
+    6,
+    2,
+    23,
+    14
+   ]
+  },
+  {
+   "id": "financebench_id_01490",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    4
+   ],
+   "top_pages": [
+    4,
+    6,
+    15,
+    12,
+    23
+   ]
+  },
+  {
+   "id": "financebench_id_01491",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    4
+   ],
+   "top_pages": [
+    4,
+    2,
+    6,
+    14,
+    12
+   ]
+  },
+  {
+   "id": "financebench_id_01487",
+   "kind": "novel-generated",
+   "rank": 2,
+   "evidence": [
+    10
+   ],
+   "top_pages": [
+    1,
+    10,
+    11,
+    6,
+    5
+   ]
+  },
+  {
+   "id": "financebench_id_00299",
+   "kind": "novel-generated",
+   "rank": 5,
+   "evidence": [
+    19
+   ],
+   "top_pages": [
+    160,
+    5,
+    28,
+    9,
+    19
+   ]
+  },
+  {
+   "id": "financebench_id_02119",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    6
+   ],
+   "top_pages": [
+    144,
+    31,
+    1,
+    40,
+    4
+   ]
+  },
+  {
+   "id": "financebench_id_00206",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    3
+   ],
+   "top_pages": [
+    345,
+    335,
+    282,
+    167,
+    68
+   ]
+  },
+  {
+   "id": "financebench_id_00394",
+   "kind": "novel-generated",
+   "rank": 7,
+   "evidence": [
+    21
+   ],
+   "top_pages": [
+    7,
+    177,
+    8,
+    4,
+    10
+   ]
+  },
+  {
+   "id": "financebench_id_02049",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    85
+   ],
+   "top_pages": [
+    85,
+    42,
+    87,
+    4,
+    8
+   ]
+  },
+  {
+   "id": "financebench_id_10499",
+   "kind": "metrics-generated",
+   "rank": 1,
+   "evidence": [
+    50,
+    52
+   ],
+   "top_pages": [
+    52,
+    115,
+    114,
+    137,
+    55
+   ]
+  },
+  {
+   "id": "financebench_id_04412",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    67,
+    69
+   ],
+   "top_pages": [
+    77,
+    58,
+    72,
+    76,
+    22
+   ]
+  },
+  {
+   "id": "financebench_id_03031",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    68
+   ],
+   "top_pages": [
+    76,
+    78,
+    68,
+    51,
+    77
+   ]
+  },
+  {
+   "id": "financebench_id_03718",
+   "kind": "metrics-generated",
+   "rank": 10,
+   "evidence": [
+    63
+   ],
+   "top_pages": [
+    60,
+    106,
+    68,
+    81,
+    104
+   ]
+  },
+  {
+   "id": "financebench_id_04171",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    57
+   ],
+   "top_pages": [
+    48,
+    50,
+    56,
+    49,
+    92
+   ]
+  },
+  {
+   "id": "financebench_id_03849",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    65,
+    67
+   ],
+   "top_pages": [
+    51,
+    41,
+    65,
+    56,
+    42
+   ]
+  },
+  {
+   "id": "financebench_id_01254",
+   "kind": "domain-relevant",
+   "rank": 2,
+   "evidence": [
+    32
+   ],
+   "top_pages": [
+    64,
+    32,
+    48,
+    47,
+    62
+   ]
+  },
+  {
+   "id": "financebench_id_00382",
+   "kind": "novel-generated",
+   "rank": 3,
+   "evidence": [
+    13
+   ],
+   "top_pages": [
+    2,
+    4,
+    13,
+    1,
+    15
+   ]
+  },
+  {
+   "id": "financebench_id_01911",
+   "kind": "novel-generated",
+   "rank": 3,
+   "evidence": [
+    14
+   ],
+   "top_pages": [
+    7,
+    2,
+    14,
+    9,
+    11
+   ]
+  },
+  {
+   "id": "financebench_id_01912",
+   "kind": "novel-generated",
+   "rank": 6,
+   "evidence": [
+    3,
+    4
+   ],
+   "top_pages": [
+    13,
+    6,
+    7,
+    5,
+    2
+   ]
+  },
+  {
+   "id": "financebench_id_00407",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    11
+   ],
+   "top_pages": [
+    11,
+    10,
+    3,
+    6,
+    37
+   ]
+  },
+  {
+   "id": "financebench_id_04700",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    52
+   ],
+   "top_pages": [
+    96,
+    16,
+    3,
+    94,
+    30
+   ]
+  },
+  {
+   "id": "financebench_id_00552",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    60
+   ],
+   "top_pages": [
+    63,
+    96,
+    66,
+    102,
+    51
+   ]
+  },
+  {
+   "id": "financebench_id_04458",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    40,
+    42
+   ],
+   "top_pages": [
+    27,
+    47,
+    42,
+    45,
+    31
+   ]
+  },
+  {
+   "id": "financebench_id_03282",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    45
+   ],
+   "top_pages": [
+    31,
+    30,
+    45,
+    32,
+    47
+   ]
+  },
+  {
+   "id": "financebench_id_04302",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    46
+   ],
+   "top_pages": [
+    22,
+    4,
+    25,
+    38,
+    36
+   ]
+  },
+  {
+   "id": "financebench_id_03531",
+   "kind": "metrics-generated",
+   "rank": 2,
+   "evidence": [
+    54
+   ],
+   "top_pages": [
+    26,
+    54,
+    82,
+    76,
+    42
+   ]
+  },
+  {
+   "id": "financebench_id_04080",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    59,
+    61
+   ],
+   "top_pages": [
+    90,
+    89,
+    12,
+    45,
+    35
+   ]
+  },
+  {
+   "id": "financebench_id_01163",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    62
+   ],
+   "top_pages": [
+    62,
+    48,
+    49,
+    14,
+    82
+   ]
+  },
+  {
+   "id": "financebench_id_00080",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    61
+   ],
+   "top_pages": [
+    8,
+    14,
+    107,
+    50,
+    106
+   ]
+  },
+  {
+   "id": "financebench_id_04980",
+   "kind": "metrics-generated",
+   "rank": 7,
+   "evidence": [
+    63
+   ],
+   "top_pages": [
+    53,
+    54,
+    52,
+    47,
+    67
+   ]
+  },
+  {
+   "id": "financebench_id_01009",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    4,
+    5
+   ],
+   "top_pages": [
+    4,
+    32,
+    100,
+    45,
+    64
+   ]
+  },
+  {
+   "id": "financebench_id_00735",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    26
+   ],
+   "top_pages": [
+    13,
+    112,
+    68,
+    4,
+    503
+   ]
+  },
+  {
+   "id": "financebench_id_01328",
+   "kind": "domain-relevant",
+   "rank": 6,
+   "evidence": [
+    78
+   ],
+   "top_pages": [
+    49,
+    64,
+    109,
+    46,
+    68
+   ]
+  },
+  {
+   "id": "financebench_id_03620",
+   "kind": "metrics-generated",
+   "rank": 3,
+   "evidence": [
+    62,
+    64
+   ],
+   "top_pages": [
+    54,
+    77,
+    64,
+    80,
+    59
+   ]
+  },
+  {
+   "id": "financebench_id_04481",
+   "kind": "metrics-generated",
+   "rank": 8,
+   "evidence": [
+    62,
+    64
+   ],
+   "top_pages": [
+    54,
+    114,
+    47,
+    59,
+    68
+   ]
+  },
+  {
+   "id": "financebench_id_01482",
+   "kind": "novel-generated",
+   "rank": 2,
+   "evidence": [
+    4
+   ],
+   "top_pages": [
+    3,
+    4,
+    5,
+    1,
+    2
+   ]
+  },
+  {
+   "id": "financebench_id_00705",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    2,
+    81,
+    85,
+    3,
+    160
+   ]
+  },
+  {
+   "id": "financebench_id_00882",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    2,
+    85,
+    3,
+    163,
+    160
+   ]
+  },
+  {
+   "id": "financebench_id_01474",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    1
+   ],
+   "top_pages": [
+    1,
+    3,
+    16,
+    12,
+    10
+   ]
+  },
+  {
+   "id": "financebench_id_01476",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    1
+   ],
+   "top_pages": [
+    1,
+    3,
+    2,
+    12,
+    7
+   ]
+  },
+  {
+   "id": "financebench_id_00302",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    59
+   ],
+   "top_pages": [
+    63,
+    32,
+    76,
+    21,
+    71
+   ]
+  },
+  {
+   "id": "financebench_id_00702",
+   "kind": "novel-generated",
+   "rank": null,
+   "evidence": [
+    57
+   ],
+   "top_pages": [
+    63,
+    44,
+    76,
+    107,
+    24
+   ]
+  },
+  {
+   "id": "financebench_id_02416",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    70,
+    71
+   ],
+   "top_pages": [
+    71,
+    9,
+    50,
+    19,
+    112
+   ]
+  },
+  {
+   "id": "financebench_id_00283",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    41
+   ],
+   "top_pages": [
+    41,
+    37,
+    50,
+    14,
+    44
+   ]
+  },
+  {
+   "id": "financebench_id_00724",
+   "kind": "novel-generated",
+   "rank": 8,
+   "evidence": [
+    38
+   ],
+   "top_pages": [
+    49,
+    46,
+    13,
+    47,
+    42
+   ]
+  },
+  {
+   "id": "financebench_id_02419",
+   "kind": "novel-generated",
+   "rank": 3,
+   "evidence": [
+    41
+   ],
+   "top_pages": [
+    13,
+    38,
+    41,
+    17,
+    37
+   ]
+  },
+  {
+   "id": "financebench_id_00746",
+   "kind": "domain-relevant",
+   "rank": 1,
+   "evidence": [
+    1
+   ],
+   "top_pages": [
+    1,
+    33,
+    80,
+    104,
+    105
+   ]
+  },
+  {
+   "id": "financebench_id_00521",
+   "kind": "domain-relevant",
+   "rank": 2,
+   "evidence": [
+    57
+   ],
+   "top_pages": [
+    7,
+    57,
+    6,
+    11,
+    12
+   ]
+  },
+  {
+   "id": "financebench_id_00601",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    2,
+    1,
+    3,
+    8,
+    5
+   ]
+  },
+  {
+   "id": "financebench_id_00603",
+   "kind": "novel-generated",
+   "rank": 4,
+   "evidence": [
+    3
+   ],
+   "top_pages": [
+    1,
+    7,
+    8,
+    3,
+    2
+   ]
+  },
+  {
+   "id": "financebench_id_00605",
+   "kind": "novel-generated",
+   "rank": 4,
+   "evidence": [
+    3
+   ],
+   "top_pages": [
+    1,
+    4,
+    8,
+    3,
+    7
+   ]
+  },
+  {
+   "id": "financebench_id_00606",
+   "kind": "novel-generated",
+   "rank": 2,
+   "evidence": [
+    2
+   ],
+   "top_pages": [
+    1,
+    2,
+    6,
+    8,
+    3
+   ]
+  },
+  {
+   "id": "financebench_id_00859",
+   "kind": "novel-generated",
+   "rank": 1,
+   "evidence": [
+    85
+   ],
+   "top_pages": [
+    85,
+    63,
+    46,
+    47,
+    87
+   ]
+  },
+  {
+   "id": "financebench_id_02024",
+   "kind": "novel-generated",
+   "rank": 2,
+   "evidence": [
+    63,
+    94
+   ],
+   "top_pages": [
+    89,
+    94,
+    17,
+    45,
+    95
+   ]
+  },
+  {
+   "id": "financebench_id_00216",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    56
+   ],
+   "top_pages": [
+    42,
+    37,
+    45,
+    46,
+    62
+   ]
+  },
+  {
+   "id": "financebench_id_00215",
+   "kind": "domain-relevant",
+   "rank": 3,
+   "evidence": [
+    23,
+    56
+   ],
+   "top_pages": [
+    21,
+    38,
+    23,
+    37,
+    39
+   ]
+  },
+  {
+   "id": "financebench_id_00566",
+   "kind": "domain-relevant",
+   "rank": null,
+   "evidence": [
+    77
+   ],
+   "top_pages": [
+    68,
+    41,
+    38,
+    18,
+    25
+   ]
+  },
+  {
+   "id": "financebench_id_06247",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    57,
+    59
+   ],
+   "top_pages": [
+    64,
+    87,
+    49,
+    223,
+    50
+   ]
+  },
+  {
+   "id": "financebench_id_04784",
+   "kind": "metrics-generated",
+   "rank": null,
+   "evidence": [
+    48
+   ],
+   "top_pages": [
+    77,
+    29,
+    30,
+    34,
+    103
+   ]
+  },
+  {
+   "id": "financebench_id_06741",
+   "kind": "metrics-generated",
+   "rank": 2,
+   "evidence": [
+    51,
+    56
+   ],
+   "top_pages": [
+    35,
+    56,
+    31,
+    81,
+    80
+   ]
+  }
+ ]
+}
