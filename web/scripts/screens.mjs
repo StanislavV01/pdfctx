@@ -32,6 +32,10 @@ try {
   console.log("search did not finish; page text:\n" + (await page.locator("aside").last().innerText()));
   throw e;
 }
+if (process.env.DEMO_PICK) {
+  // Show a specific hit (e.g. the row that answers the question) rather than the first one.
+  await page.locator("aside button", { hasText: process.env.DEMO_PICK }).first().click();
+}
 await page.waitForLoadState("networkidle");
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${OUT}/3-search.png` });
