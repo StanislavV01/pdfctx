@@ -27,6 +27,10 @@ def is_heading(line: Line, body: float, standalone: bool) -> bool:
         return False
     if not any(c.isalpha() for c in text):
         return False
+    rest = words[1:] if len(words) > 1 and re.fullmatch(r"\d{1,2}(\.\d{1,3})*\.?", words[0]) else words
+    numeric = sum(1 for w in rest if any(c.isdigit() for c in w) or w in {"%", "$"})
+    if numeric * 2 >= len(rest):
+        return False  # a table header row like "2018 2017 % change"
     if line.size >= 1.15 * body:
         return True
     if not standalone:

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from .parse.model import ParsedDoc
 
-_NUMBERING = re.compile(r"^(\d+(?:\.\d+)*)\.?\s")
+_NUMBERING = re.compile(r"^(\d{1,2}(?:\.\d{1,3})*)\.?\s")  # 1, 2.1, 10.3 — not years
 _LABELED = re.compile(r"^(item|article|part|chapter|section)\s+[\w.]+", re.I)
 
 
@@ -62,6 +62,8 @@ def _heading_level(text: str, size: float, size_rank: dict[float, int]) -> int:
         return m.group(1).count(".") + 1
     if _LABELED.match(text):
         return 1
+    if text.rstrip().endswith(":"):
+        return len(size_rank) + 1  # run-in labels ("Cash Flow Hedges:") sit under the current section
     return size_rank[round(size * 2) / 2]
 
 

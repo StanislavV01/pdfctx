@@ -102,3 +102,17 @@ def test_inline_page_numbers_dropped(tmp_path):
     assert [b.text for b in doc.blocks if b.text.strip().isdigit()] == []
     assert not any(b.text.rstrip()[-2:] in {" 1", " 2", " 3"} for b in doc.blocks)
     assert sum("Body text of page" in b.text for b in doc.blocks) == 3
+
+
+def test_numeric_header_rows_are_not_headings():
+    from pdfctx.parse.blocks import is_heading
+    from pdfctx.parse.model import Line, Word
+
+    line = Line(
+        1,
+        [
+            Word(t, i * 40, 0, i * 40 + 30, 10, 8.6, True)
+            for i, t in enumerate(["2018", "2017", "%", "change"])
+        ],
+    )
+    assert not is_heading(line, 8.6, standalone=True)

@@ -69,3 +69,36 @@ def test_context_prefix_and_ablation_switches(report_pdf):
     assert not any(u.kind == "row" for u in with_ctx)
     plain = make_units(doc, sections, assign, contextual=False, table_rows=False)
     assert all(u.context == "" for u in plain if u.kind != "table")
+
+
+def test_year_led_and_label_headings_do_not_become_top_level():
+    from pathlib import Path
+
+    from pdfctx.parse.model import ParsedDoc, RawBlock
+
+    def h(text, size=8.6):
+        return RawBlock("heading", 1, (0, 0, 1, 1), text, size=size, bold=True)
+
+    def p(text):
+        return RawBlock("paragraph", 1, (0, 0, 1, 1), text, size=8.6)
+
+    doc = ParsedDoc(
+        Path("x.pdf"),
+        "x",
+        1,
+        blocks=[
+            h("Item 7. Management's Discussion"),
+            p("text"),
+            h("2019 Net Periodic Benefit Cost Components:", size=7.3),
+            p("more"),
+            h("Item 8. Financial Statements"),
+            p("statements"),
+        ],
+    )
+    sections, _ = build_outline(doc)
+    tree = _tree(sections)
+    assert tree == [
+        ("Item 7. Management's Discussion", None),
+        ("2019 Net Periodic Benefit Cost Components:", "Item 7. Management's Discussion"),
+        ("Item 8. Financial Statements", None),
+    ]
