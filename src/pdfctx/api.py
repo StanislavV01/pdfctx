@@ -96,6 +96,10 @@ def create_app(lib: Library, upload_dir: Path | None = None, host: str = "127.0.
     def cite(block_id: str) -> dict:
         return lib.cite(block_id)
 
+    @app.get("/v1/audit")
+    def audit(limit: int = 100) -> dict:
+        return {"entries": lib.audit(limit)}
+
     @app.post("/v1/context")
     def context(body: ContextRequest) -> dict:
         return lib.context_pack(body.query, body.budget_tokens, body.doc_ids)

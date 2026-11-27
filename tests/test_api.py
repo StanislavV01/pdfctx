@@ -36,6 +36,12 @@ def test_rest_mirrors_tools(client):
     assert pack["used_tokens"] <= 300
 
 
+def test_audit_route(client):
+    client.get("/v1/search", params={"q": "revenue"})
+    entries = client.get("/v1/audit", params={"limit": 5}).json()["entries"]
+    assert entries[0]["tool"] == "search" and entries[0]["args"]["query"] == "revenue"
+
+
 def test_errors_are_json(client):
     r = client.get("/v1/sections/nope:s1")
     assert r.status_code == 404 and r.json() == {"error": "unknown section 'nope:s1'"}
